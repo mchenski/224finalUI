@@ -296,6 +296,9 @@ void MainWindow::transformPressed() {
     } else {
         ui->canvas2D->envmapRows = -1;
         ui->canvas2D->envmapCols = -1;
+        if(ui->canvas2D->getPaintedColors().size() > 0){
+            ui->canvas2D->getPaintedColors().clear();
+        }
     }
 }
 

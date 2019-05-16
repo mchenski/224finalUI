@@ -422,13 +422,12 @@ bool MaterialManager::makeCaustic(){
     vectorToFile(retexturing, "images/glass.png", rows, cols);
 
 
-
     std::cout << "creating python environment" << std::endl;
     QProcess p;
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
     env.insert("PYTHONPATH", "/Users/purvigoel/anaconda3/lib/python3.6/site-packages");
     QStringList params;
-    params << "target_caustic_inverse.py" << materialParams.mainImageFile << materialParams.maskFile <<  ">>" << "log_caustic.txt";
+    params << "target_caustic_inverse.py" << "images/depthMap.png" << materialParams.maskFile <<  ">>" << "log_caustic.txt";
     p.setStandardOutputFile("log.txt");
     p.start("/Users/purvigoel/anaconda3/bin/python", params);
     p.waitForFinished(-1);

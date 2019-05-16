@@ -16,13 +16,95 @@
 #include <fstream>
 #include <QProcess>
 #include <QProcessEnvironment>
+#include <map>
 
+#define OPTIMIZE 1
 using namespace Eigen;
 using namespace std;
 BrdfReplacement::BrdfReplacement()
 {
     sampleNum = 400;
 
+//    for(int i = 0; i < sampleNum; i++){
+//        SHSample sh;
+//        sh.sph = Vector3f(0,0,0);
+//        sh.vec = Vector3f(0,0,0);
+//        m_samples.push_back(sh);
+//    }
+    //samples(m_samples);
+
+}
+
+void BrdfReplacement::samples(std::vector<SHSample> &samples){
+    int i = 0;
+    int bands = 2;
+    for(int a = 0; a < 20; a++){
+        for(int b = 0; b < 20; b++){
+            float x = (a + float(rand())/RAND_MAX) / 20.0f;
+            float y = (b + float(rand())/RAND_MAX) / 20.0f;
+            float theta = 2.0 * acos(sqrtf(1.0f - x));
+            float phi = 2.0f * M_PI * y;
+            samples[i].sph = Vector3f(theta, phi, 1.0f);
+            samples[i].vec = Vector3f(sin(theta) * cos(phi), sin(theta)* sin(phi), cos(theta));
+            for(int l = 0; l < bands; l++){
+                for(int m = -l; m <= l; m++){
+                    samples[i].coeff.push_back(SH(l, m, theta, phi));
+                }
+            }
+            std::cout << i << std::endl;
+            i += 1;
+
+        }
+    }
+}
+
+float BrdfReplacement::P(int l, int m, float x){
+    float pmm = 1.0f;
+    if(m > 0){
+        float somx2 = sqrtf((1.0f - x) * (1.0f + x));
+        float fact = 1.0f;
+        for(int i = 1; i <= m; i++){
+            pmm *= (-fact) * somx2;
+            fact += 2.0f;
+        }
+    }
+    if (l == m){
+        return pmm;
+    }
+    float pmmp1 = x * (2.0f * m + 1.0f) * pmm;
+    if( l == (m + 1)){
+        return pmmp1;
+    }
+    float pll = 0.0f;
+    for(int ll = m + 2; ll <= l; l++){
+        pll = ( (2.0 * ll - 1.0) * x * pmmp1 - (ll + m - 1.0f) * pmm) / (ll - m);
+        pmm = pmmp1;
+        pmmp1 = pll;
+    }
+    return pll;
+}
+
+int BrdfReplacement::factorial(int n)
+{
+  return (n == 1 || n == 0) ? 1 : factorial(n - 1) * n;
+}
+
+float BrdfReplacement::K(int l, int m){
+    float temp = ((2.0f * float(l) + 1.0f) * factorial(l - m)) / (4.0 * M_PI * factorial(l + m));
+    return sqrtf(temp);
+}
+
+float BrdfReplacement::SH(int l, int m, float theta, float phi){
+    float sqrt2 = sqrtf(2.0f);
+    if(m == 0){
+        return K(l, 0) * P(l, m, cos(theta));
+    }
+    else if (m > 0){
+        return sqrt2 * K(l, m) * cos(m * phi) * P(l, m, cos(theta));
+    }
+    else {
+        return sqrt2 * K(l, -m) * sin(-m * phi) * P(l, -m, cos(theta));
+    }
 }
 
 void BrdfReplacement::importanceSampling(int rows, int cols, std::vector<Vector3f> &directionVectors, std::vector<Vector3f> &sampledColors, std::vector<Vector3f> inpainting){
@@ -67,12 +149,14 @@ std::vector<Vector3f> BrdfReplacement::sample(std::vector<Vector3f> inpainting, 
     float xC = float(cols)/2;
     float yC = float(rows)/2;
 
+
     std::vector<Vector3f> brdfReplacement;
     Vector3f color = m_diffuse;
     Vector3f specular = m_specular;
     float n = 5;
 
     int maskInd = 0;
+    int sampleAv = 0;
     for(int y = 0; y < rows; y++){
         for(int x = 0; x < cols; x++){
 
@@ -84,10 +168,20 @@ std::vector<Vector3f> BrdfReplacement::sample(std::vector<Vector3f> inpainting, 
                     Vector3f sampleDir = directions[sample].normalized();
                     Vector3f objectNormal = normals[objectInd];
                     objectNormal = objectNormal.normalized();
-                    if(sampleDir.dot(objectNormal) > 0){
-                        sampleCount += 1;
-                    }
 
+                    Vector3f V = Vector3f(x - xC, rows - y - yC, 100); // theres something goin on here
+                    V = V.normalized();
+                    Vector3f refl = (sampleDir) - 2 * (objectNormal.dot(sampleDir)) * objectNormal;
+                    refl = -refl.normalized();
+                    if(OPTIMIZE){
+                        if(sampleDir.dot(objectNormal) > 0.0f && sampledColors[sample] != Vector3f(0,0,0)){
+                            sampleCount += 1;
+                        }
+                    } else {
+                        if(sampleDir.dot(objectNormal) > 0.0f){
+                            sampleCount += 1;
+                        }
+                    }
                 }
                 Vector3f V = Vector3f(x - xC, rows - y - yC, 100); // theres something goin on here
                 V = V.normalized();
@@ -106,12 +200,14 @@ std::vector<Vector3f> BrdfReplacement::sample(std::vector<Vector3f> inpainting, 
 
                     Vector3f li = sampledColors[sample] / 255.0;
 
+                    Vector3f refl = (sampleDir) - 2 * (objectNormal.dot(sampleDir)) * objectNormal;
+                    refl = -refl.normalized();
 
-
-                    if(sampleDir.dot(objectNormal) > 0){
+                    if(sampleDir.dot(objectNormal) > 0.0f){
                         pixelToSampleIds[objectInd].push_back(sample);
 
                         float nDotL = fmin(1.0,sampleDir.dot(objectNormal));
+
                         Vector3f refl = (sampleDir) - 2 * (objectNormal.dot(sampleDir)) * objectNormal;
                         refl = -refl.normalized();
                         Vector3f diffuseCoeff = color/(M_PI);
@@ -123,10 +219,21 @@ std::vector<Vector3f> BrdfReplacement::sample(std::vector<Vector3f> inpainting, 
 
                         if(m_solve){
                             float pdf = 1.0f/(M_PI * 2.0f);
-                            reds(maskInd, sample) = (fmin(coeff[0] * nDotL, 1.0)/pdf)/sampleCount;
-                            greens(maskInd, sample) = (fmin(coeff[1] * nDotL, 1.0)/pdf)/sampleCount;
-                            blues(maskInd, sample) = (fmin(coeff[2] * nDotL, 1.0)/pdf)/sampleCount;
-
+                            if(OPTIMIZE){
+                                if(fmax(fmax(coeff[0], coeff[1]), coeff[2]) * nDotL > 0.1){
+                                    reds(maskInd, sample) = (fmin(coeff[0] * nDotL, 1.0)/pdf)/sampleCount;
+                                    greens(maskInd, sample) = (fmin(coeff[1] * nDotL, 1.0)/pdf)/sampleCount;
+                                    blues(maskInd, sample) = (fmin(coeff[2] * nDotL, 1.0)/pdf)/sampleCount;
+                                } else {
+                                    reds(maskInd, sample) = 0;
+                                    greens(maskInd, sample) = 0;
+                                    blues(maskInd, sample) = 0;
+                                }
+                            } else {
+                                reds(maskInd, sample) = (fmin(coeff[0] * nDotL, 1.0)/pdf)/sampleCount;
+                                greens(maskInd, sample) = (fmin(coeff[1] * nDotL, 1.0)/pdf)/sampleCount;
+                                blues(maskInd, sample) = (fmin(coeff[2] * nDotL, 1.0)/pdf)/sampleCount;
+                            }
                         }
                     } else{
                         if(m_solve){
@@ -139,7 +246,8 @@ std::vector<Vector3f> BrdfReplacement::sample(std::vector<Vector3f> inpainting, 
                 }
                 if(sampleCount > 0){
                     float pdf = 1.0f/(M_PI * 2.0f);
-                    lPrime = 255 *  (lPrime/pdf) / sampleCount;
+                    lPrime = 255 * (lPrime/pdf) / sampleCount;
+                    sampleAv += sampleCount;
                 }
                 brdfReplacement.push_back(lPrime);
                 maskInd += 1;
@@ -149,7 +257,7 @@ std::vector<Vector3f> BrdfReplacement::sample(std::vector<Vector3f> inpainting, 
             indexCounter += 1;
         }
     }
-
+    std::cout << sampleAv/(rows * cols) << std::endl;
     std::cout << "replaced brdf" << std::endl;
     return brdfReplacement;
 }
@@ -201,9 +309,13 @@ std::vector<Vector3f> BrdfReplacement::replaceBrdf(std::vector<Vector3f> inpaint
 
 }
 
+
 std::vector<Vector3f> BrdfReplacement::paintEnvMap(std::vector<Vector3f> inpainting, std::vector<Vector3f> mask, std::vector<Vector3f> normals,int rows, int cols, std::vector<Vector3f> desiredColors, Vector2f highlight){
     std::vector<Vector3f> directions;
     std::vector<Vector3f> sampledColors;
+
+    std::map<float, std::vector<Vector3f>> colorAndNormals;
+    std::map<float, std::vector<Vector2f>> colorAndLocations;
 
     for(int i = 0; i < rows; i ++){
         for(int j = 0; j < cols; j ++){
@@ -226,34 +338,63 @@ std::vector<Vector3f> BrdfReplacement::paintEnvMap(std::vector<Vector3f> inpaint
     int maskInd = 0;
     // define desired lighting
     std::vector<int> changedPixels;
-    for(int i = 0; i < rows; i ++){
-        for(int j = 0; j < cols; j ++){
-            if(mask[i * cols + j][0] > 150){
-                if(desiredColors[i * cols + j] != Vector3f(0,0,0)){
-                    changedPixels.push_back(maskInd);
-                }
-                maskInd += 1;
-            }
-        }
-    }
-    std::cout << "number of user color inputs: " << changedPixels.size() << std::endl;
-    VectorXf desiredReds(changedPixels.size());
-    VectorXf desiredGreens(changedPixels.size());
-    VectorXf desiredBlues(changedPixels.size());
+    std::vector<float> desiredReds;
+    std::vector<float> desiredGreens;
+    std::vector<float> desiredBlues;
     int desired_num = 0;
     for(int i = 0; i < rows; i ++){
         for(int j = 0; j < cols; j ++){
             if(mask[i * cols + j][0] > 150){
                 if(desiredColors[i * cols + j] != Vector3f(0,0,0)){
-                     desiredReds(desired_num) = desiredColors[i * cols + j][0];
-                     desiredGreens(desired_num) = desiredColors[i * cols + j][1];
-                     desiredBlues(desired_num) = desiredColors[i * cols + j][2];
-                     desired_num += 1;
+                    if(OPTIMIZE){
+                        Vector3f color = desiredColors[i * cols + j];
+
+                        float luminance =  0.213f * color[0] + 0.715f * color[1] + 0.072f * color[2];
+                         if(colorAndNormals.count(luminance) == 0){
+                             colorAndNormals[luminance].push_back(normals[i * cols + j]);
+                             colorAndLocations[luminance].push_back(Vector2f(i, j));
+                             desiredReds.push_back(desiredColors[i * cols + j][0]);
+                             desiredGreens.push_back(desiredColors[i * cols + j][1]);
+                             desiredBlues.push_back(desiredColors[i * cols + j][2]);
+                             changedPixels.push_back(maskInd);
+                             desired_num += 1;
+                         } else {
+                             int count = 0;
+                             Vector3f objectNormal = normals[i * cols + j];
+                             Vector2f spatialLoc = Vector2f(i,j);
+                             for(int n = 0; n < colorAndNormals[luminance].size(); n++){
+                                 Vector3f prevNormal = colorAndNormals[luminance][n];
+                                 Vector2f yx = colorAndLocations[luminance][n];
+                                 float dist = sqrtf((spatialLoc - yx).dot(spatialLoc - yx));
+                                 if(fabs(objectNormal.dot(prevNormal)) < 0.7 || dist > 25){
+                                     count += 1;
+                                 } else {
+                                     break;
+                                 }
+                             }
+                             if(count == colorAndNormals[luminance].size()){
+                                 colorAndNormals[luminance].push_back(objectNormal);
+                                 colorAndLocations[luminance].push_back(spatialLoc);
+                                 desiredReds.push_back(desiredColors[i * cols + j][0]);
+                                 desiredGreens.push_back(desiredColors[i * cols + j][1]);
+                                 desiredBlues.push_back(desiredColors[i * cols + j][2]);
+                                 changedPixels.push_back(maskInd);
+                                 desired_num += 1;
+                             }
+                         }
+                    } else {
+                         desiredReds.push_back(desiredColors[i * cols + j][0]);
+                         desiredGreens.push_back(desiredColors[i * cols + j][1]);
+                         desiredBlues.push_back(desiredColors[i * cols + j][2]);
+                         changedPixels.push_back(maskInd);
+                         desired_num += 1;
+                    }
                 }
+                maskInd += 1;
             }
         }
     }
-
+    std::cout << "desired num " << desired_num << " " << colorAndNormals.size() << " " <<colorAndLocations.size()<< std::endl;
     MatrixXf redToSolve(desired_num, sampleNum);
     MatrixXf greenToSolve(desired_num, sampleNum);
     MatrixXf blueToSolve(desired_num, sampleNum);
@@ -274,9 +415,9 @@ std::vector<Vector3f> BrdfReplacement::paintEnvMap(std::vector<Vector3f> inpaint
     writeCoefficientsToFile("blues.txt", redToSolve, desired_num);
     writeCoefficientsToFile("greens.txt", redToSolve, desired_num);
 
-    writeDesiredToFile("desired_reds.txt", desiredReds, desired_num);
-    writeDesiredToFile("desired_blues.txt", desiredBlues, desired_num);
-    writeDesiredToFile("desired_greens.txt", desiredGreens, desired_num);
+    writeDesiredToFile("desired_reds.txt", desiredReds);
+    writeDesiredToFile("desired_blues.txt", desiredBlues);
+    writeDesiredToFile("desired_greens.txt", desiredGreens);
 
     std::cout << "creating python environment" << std::endl;
     QProcess p;
@@ -300,9 +441,10 @@ std::vector<Vector3f> BrdfReplacement::paintEnvMap(std::vector<Vector3f> inpaint
 
 
     saveEnvmap(sampledColors);
-
+    Vector3f copy = m_diffuse;
+    m_diffuse = Vector3f(0.5f, 0.5f, 0.5f);
     std::vector<Vector3f> image = sample(inpainting, mask, directions, normals, sampledColors, rows, cols);
-
+    m_diffuse = copy;
 //    std::vector<Vector3f> highlights;
 //    std::vector<Vector3f> lightColors;
 //    if(highlight[0] >= 0 && highlight[1] >= 0){
@@ -365,12 +507,12 @@ void BrdfReplacement::writeCoefficientsToFile(std::string filename, MatrixXf dat
     file.close();
 }
 
-void BrdfReplacement::writeDesiredToFile(std::string filename, VectorXf data, int dataNum){
+void BrdfReplacement::writeDesiredToFile(std::string filename, std::vector<float> data){
     ofstream file;
     file.open(filename);
 
-    for(int j = 0; j < dataNum; j++){
-          file << std::to_string(data(j));
+    for(int j = 0; j < data.size(); j++){
+          file << std::to_string(data[j]);
           file << '\n';
     }
     file.close();

@@ -10,6 +10,7 @@ ImageReader::ImageReader(QString filename)
     if(success){
         m_imageData = reinterpret_cast<QRgb *>(m_image.bits());
         m_filename = filename;
+        std::cout << m_image.width()<<std::endl;
     } else {
         std::cout << "Could not read image." << std::endl;
     }

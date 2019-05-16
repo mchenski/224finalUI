@@ -15,6 +15,13 @@
 #include <Eigen/SparseQR>
 #include <Eigen/Sparse>
 
+using namespace Eigen;
+struct SHSample{
+    Vector3f sph;
+    Vector3f vec;
+    std::vector<float> coeff;
+};
+
 class BrdfReplacement
 {
 public:
@@ -34,7 +41,7 @@ public:
 
     std::map<int, std::vector<int>> pixelToSampleIds;
     void writeCoefficientsToFile(std::string filename, Eigen::MatrixXf data, int num);
-    void writeDesiredToFile(std::string filename, Eigen::VectorXf data, int dataNum);
+    void writeDesiredToFile(std::string filename, std::vector<float> data);
     void saveEnvmap(std::vector<Eigen::Vector3f> sampledColors);
     void getNewEnvmap(std::string filename, Eigen::VectorXf &envmapChannel);
     std::vector<int> us;
@@ -52,6 +59,14 @@ public:
     int m_solve = 0;
     int m_maskArea = 0;
     int sampleNum = 0;
+
+
+    float SH(int l, int m, float theta, float phi);
+    float K(int l, int m);
+    int factorial(int n);
+    float P(int l, int m, float x);
+    void samples(std::vector<SHSample> &samples);
+    std::vector<SHSample> m_samples;
 };
 
 #endif // BRDFREPLACEMENT_H

@@ -114,7 +114,7 @@ void Canvas2D::mouseDragged(int x, int y) {
             if(y < m_image->height() && x < m_image->width() && y > 0 && x > 0){
                 int index = y * m_image->width() + x;
                 m_highlightColors[index] = Eigen::Vector3f((float)settings.specularColor.r, (float)settings.specularColor.g, (float)settings.specularColor.b);
-                m_image->setPixelColor(x, y, QColor(settings.specularColor.r, settings.specularColor.g, settings.specularColor.b));
+                //m_image->setPixelColor(x, y, QColor(settings.specularColor.r, settings.specularColor.g, settings.specularColor.b));
                 highlight = Eigen::Vector2f(x,y);
                 if(envmapRows > 0){
                     BrdfReplacement br;
