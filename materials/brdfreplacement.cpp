@@ -137,7 +137,7 @@ std::vector<Vector3f> BrdfReplacement::sample(std::vector<Vector3f> inpainting, 
 //                        Vector3f specularCoeff = specular/(M_PI) * (n + 2) * pow(fmax(0, refl.dot(V)), n);
 //                        Vector3f coeff = diffuseCoeff + specularCoeff;
 
-                        Vector3f coeff = brdf(sampleDir, V, objectNormal, 0);
+                        Vector3f coeff = brdf(sampleDir, V, objectNormal, brdf_type);
 
 
                         lPrime[0] += fmin(li[0] * coeff[0] * nDotL , 1.0);

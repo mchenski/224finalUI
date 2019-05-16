@@ -80,6 +80,7 @@ public:
     bool makeCaustic();
     bool transformMaterial();
     bool changeLighting();
+    bool makeGlossy();
 };
 
 #endif // MATERIALMANAGER_H

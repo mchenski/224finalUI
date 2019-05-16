@@ -9,7 +9,11 @@
 #include <QProcessEnvironment>
 #include <iostream>
 #include <fstream>
+<<<<<<< HEAD
 #include "Settings.h"
+=======
+#include <cmath>
+>>>>>>> da57f6a49ddafad30fcb4b67db3fbd02206a6783
 
 MaterialManager::MaterialManager()
 {
@@ -34,6 +38,9 @@ bool MaterialManager::transformMaterial(){
     }
     if(materialParams.makeMaterial == LIGHTING){
         return changeLighting();
+    }
+    if(materialParams.makeMaterial == GLOSSY) {
+        return makeGlossy(1);
     }
 }
 
@@ -407,9 +414,6 @@ bool MaterialManager::makeCaustic(){
     if(!areGlassParametersValid()){
         return false;
     }
-    if(materialParams.causticCorners.size() != 8){
-        return false;
-    }
 
     retextureObj.m_frosty = materialParams.frosty;
     retextureObj.m_s = materialParams.s;
@@ -433,12 +437,13 @@ bool MaterialManager::makeCaustic(){
     vectorToFile(retexturing, "images/glass.png", rows, cols);
 
 
+
     std::cout << "creating python environment" << std::endl;
     QProcess p;
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
     env.insert("PYTHONPATH", "/Users/purvigoel/anaconda3/lib/python3.6/site-packages");
     QStringList params;
-    params << "target_caustic_inverse.py" << "images/depthMap.png" << materialParams.maskFile <<  ">>" << "log_caustic.txt";
+    params << "target_caustic_inverse.py" << materialParams.mainImageFile << materialParams.maskFile <<  ">>" << "log_caustic.txt";
     p.setStandardOutputFile("log.txt");
     p.start("/Users/purvigoel/anaconda3/bin/python", params);
     p.waitForFinished(-1);
@@ -455,9 +460,95 @@ bool MaterialManager::makeCaustic(){
     }
 
     CausticMaker cm(c, retexturing, rows, cols);
-    std::vector<int> xyLoc = materialParams.causticCorners;
-    std::vector<Vector3f> caustic = cm.project(xyLoc[0],xyLoc[1],xyLoc[2],xyLoc[3],xyLoc[4],xyLoc[5],xyLoc[6],xyLoc[7]);
+    std::vector<Vector3f> caustic = cm.project(0,0,50,0,50,50,0,50);
 
     vectorToFile(caustic, "images/output.png", rows, cols);
     return true;
+}
+
+bool MaterialManager::makeGlossy(int specular)
+{
+    std::cout<<"Before estimate shape"<<std::endl;
+    ImageReader im(materialParams.mainImageFile);
+    ImageReader mask(materialParams.maskFile);
+
+    int cols = im.getImageWidth();
+    int rows = im.getImageHeight();
+
+    ShapeEstimation se;
+
+    if(!areShapeEstimationParamsValid()){
+        return false;
+    }
+
+    std::vector<float> depth;
+    std::vector<Eigen::Vector3f> normals;
+    std::vector<float> gradientX;
+    std::vector<float> gradientY;
+
+    if(!areShapeEstimationParamsValid()){
+        return false;
+    }
+
+    se.m_bilateralSmoothing = materialParams.bilateralSmoothing;
+    se.m_curvature = materialParams.curvature;
+
+
+    se.estimateShape(im,mask, depth, normals, gradientX, gradientY);
+    std::cout<<"Before get luminances"<<std::endl;
+    Histogram hist(se.getLuminances());
+    std::vector<float> highlights = hist.getHighlightsMaxAndMin();
+    float min = highlights[0]*100.f;
+    std::cout<< "Min highlights is: " << min <<std::endl;
+    float max = highlights[1]*100.f;
+    std::cout<< "Max highlights is: " << max << std::endl;
+    float hMax = hist.findPeakHistogramValue();
+
+    std::vector<Vector3f> originalImage = im.toVector();
+    float alpha = 0.5;
+    float beta = 20.f;
+
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            if (QColor(mask.pixelAt(i, j)).red() > 150) {
+                // In the object
+                QColor pix = QColor(im.pixelAt(i, j));
+                int index = im.indexAt(i, j);
+                float lum = pix.red()*0.2126 + pix.green()*0.7152 + pix.blue()*0.0722;
+
+                if (lum > min) {
+                    // Calculate new luminance
+                    if (specular) {
+                        // Make more specular
+                        beta = 20.f;
+                        float partial = pow(alpha * ((lum - min) / (max - min)), beta);
+                        float newlum = min + (max - min) * partial;
+                        float ratio = (newlum/lum);
+                        if (ratio > 1.3) {
+                            ratio = 1.3f;
+                        }
+                        if (newlum > lum) {
+                            std::cout<<"Ratio is: " << ratio << std::endl;
+                        }
+
+                        originalImage[index] = ratio*originalImage[index];
+                    } else {
+                        // Make more diffuse
+                        beta = 0.05;
+                        float partial = pow(((lum - hMax) / (max - hMax)), beta);
+                        float newlum = hMax + (min - hMax) * partial;
+                        originalImage[index] = ((1+(newlum/lum))/2.f)*originalImage[index];
+                    }
+
+                }
+            }
+        }
+    }
+
+    vectorToFile(originalImage, "images/output.png", rows, cols);
+    std::cout << "after vector to file" << std::endl;
+
+    return true;
+
+
 }
