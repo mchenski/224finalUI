@@ -249,7 +249,7 @@ void MainWindow::browseTexture() {
     settings.texturePath = QFileDialog::getOpenFileName(this, tr("Open File"),
                                                     QDir::currentPath(),
                                                     tr("Images (*.png *.xpm *.jpg)"));
-    if (!m_texture.isEmpty()) {
+    if (!settings.texturePath.isEmpty()) {
         if (ui->textureComboBox->findText(settings.texturePath) == -1)
             ui->textureComboBox->addItem(settings.texturePath);
         ui->textureComboBox->setCurrentIndex(ui->textureComboBox->findText(settings.texturePath));
@@ -260,11 +260,11 @@ void MainWindow::transformPressed() {
     std::cout << "autobots roll out" << std::endl;
 
     MaterialManager mm;
-    mm.materialParams.backgroundFile = "images/background.jpg"; //settings.backgroundPath;
-    mm.materialParams.mainImageFile = "images/han.jpg"; //settings.imagePath;
+    mm.materialParams.backgroundFile = settings.backgroundPath;
+    mm.materialParams.mainImageFile = settings.imagePath;
     mm.materialParams.bilateralSmoothing = settings.smoothing / 100.f; //0.004f;
     mm.materialParams.curvature = settings.curvature; //1.0f;
-    mm.materialParams.maskFile = "images/han_mask.jpg";
+    mm.materialParams.maskFile = settings.maskPath;
     mm.materialParams.textureFile = settings.texturePath;
 
     mm.materialParams.diffuse = Vector3f(settings.diffuseColor.r/255.f,settings.diffuseColor.g/255.f,settings.diffuseColor.b/255.f);

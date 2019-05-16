@@ -51,7 +51,7 @@ void Settings::loadSettingsOrDefaults() {
     imagePath = s.value("imagePath", "images/han.jpg").toString();
     maskPath = s.value("imagePath", "images/han_mask.jpg").toString();
     backgroundPath = s.value("backgroundPath", "images/background.jpg").toString();
-    texturePath = s.value("texturePath", "images/marble.jpg").toString();
+    texturePath = s.value("texturePath", "images/marble_han.jpg").toString();
 
 
     // Shapes
