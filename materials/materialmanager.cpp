@@ -147,6 +147,11 @@ bool MaterialManager::changeBrdf(){
     if(!areBrdfParamsValid()){
         return false;
     }
+    if(settings.BRDFType == BRDF_PHONG){
+           br.brdf_type = 0;
+    } else if(settings.BRDFType == BRDF_METALLIC){
+       br.brdf_type = 1;
+    }
     br.m_diffuse = materialParams.diffuse;
     br.m_specular = materialParams.specular;
 
@@ -195,6 +200,12 @@ bool MaterialManager::changeLighting(){
 
     if(!areBrdfParamsValid()){
         return false;
+    }
+
+    if(settings.BRDFType == BRDF_PHONG){
+           br.brdf_type = 0;
+    } else if(settings.BRDFType == BRDF_METALLIC){
+       br.brdf_type = 1;
     }
     br.m_diffuse = Vector3f(0.0f,0.0f,0.0f);
     br.m_specular = Vector3f(1.0f,1.0f,1.0f);
@@ -350,6 +361,11 @@ bool MaterialManager::makeGlass(){
     materialResults.cols = cols;
 
     BrdfReplacement br;
+    if(settings.BRDFType == BRDF_PHONG){
+           br.brdf_type = 0;
+    } else if(settings.BRDFType == BRDF_METALLIC){
+       br.brdf_type = 1;
+    }
     br.replaceBrdf(retexturing, mask.toVector(), normals, rows, cols);
     materialResults.specularDirs = br.specularDirs;
 
@@ -412,6 +428,10 @@ bool MaterialManager::makeCaustic(){
         return false;
     }
 
+    if(materialParams.causticCorners.size() != 8){
+           return false;
+    }
+
     retextureObj.m_frosty = materialParams.frosty;
     retextureObj.m_s = materialParams.s;
 
@@ -440,7 +460,7 @@ bool MaterialManager::makeCaustic(){
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
     env.insert("PYTHONPATH", "/Users/purvigoel/anaconda3/lib/python3.6/site-packages");
     QStringList params;
-    params << "target_caustic_inverse.py" << materialParams.mainImageFile << materialParams.maskFile <<  ">>" << "log_caustic.txt";
+    params << "target_caustic_inverse.py" << "images/depthMap.png" << materialParams.maskFile <<  ">>" << "log_caustic.txt";
     p.setStandardOutputFile("log.txt");
     p.start("/Users/purvigoel/anaconda3/bin/python", params);
     p.waitForFinished(-1);
@@ -457,7 +477,8 @@ bool MaterialManager::makeCaustic(){
     }
 
     CausticMaker cm(c, retexturing, rows, cols);
-    std::vector<Vector3f> caustic = cm.project(0,0,50,0,50,50,0,50);
+    std::vector<int> xyLoc = materialParams.causticCorners;
+    std::vector<Vector3f> caustic = cm.project(xyLoc[0],xyLoc[1],xyLoc[2],xyLoc[3],xyLoc[4],xyLoc[5],xyLoc[6],xyLoc[7]);
 
     vectorToFile(caustic, "images/output.png", rows, cols);
     return true;

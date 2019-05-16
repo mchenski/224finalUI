@@ -288,6 +288,7 @@ void MainWindow::transformPressed() {
             break;
 
         case TRANSFORMATION_CAUSTIC:
+            mm.materialParams.causticCorners = ui->canvas2D->xyLoc;
             mm.materialParams.makeMaterial = CAUSTIC;
             break;
 
@@ -308,6 +309,10 @@ void MainWindow::transformPressed() {
         QMessageBox::critical(this, "Error", "Could not load image");
     }
 
+    if(settings.transformationType == TRANSFORMATION_CAUSTIC){
+            ui->canvas2D->xyLoc.clear();
+    }
+
     if(settings.transformationType == TRANSFORMATION_LIGHTING || settings.transformationType == TRANSFORMATION_GLASS){
         ui->canvas2D->envmapImage = mm.materialResults.image;
         ui->canvas2D->envmapNormals = mm.materialResults.normals;
@@ -318,6 +323,9 @@ void MainWindow::transformPressed() {
     } else {
         ui->canvas2D->envmapRows = -1;
         ui->canvas2D->envmapCols = -1;
+        if(ui->canvas2D->getPaintedColors().size() > 0){
+               ui->canvas2D->getPaintedColors().clear();
+        }
     }
 }
 
