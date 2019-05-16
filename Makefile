@@ -14,7 +14,7 @@ CC            = /Applications/Xcode.app/Contents/Developer/usr/bin/gcc
 CXX           = /Applications/Xcode.app/Contents/Developer/usr/bin/g++
 DEFINES       = -D_USE_MATH_DEFINES -DTIXML_USE_STL -DGLM_SWIZZLE -DGLM_FORCE_RADIANS -DQT_NO_DEBUG -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -mmacosx-version-min=10.8 -O2 -Wall -W -fPIC $(DEFINES)
-CXXFLAGS      = -pipe -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -mmacosx-version-min=10.8 -std=c++17 -stdlib=libc++ -g -O3 -std=gnu++11 -W -Waddress -Wchar-subscripts -Wformat -Wmain -Wmissing-braces -Wparentheses -Wreorder -Wreturn-type -Wsequence-point -Wsign-compare -Wstrict-overflow=1 -Wswitch -Wtrigraphs -Wuninitialized -Wunused-label -Wunused-variable -Wvolatile-register-var -Wno-extra -fPIC $(DEFINES)
+CXXFLAGS      = -pipe -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -mmacosx-version-min=10.8 -std=c++14 -stdlib=libc++ -g -O3 -std=gnu++1y -W -Waddress -Wchar-subscripts -Wformat -Wmain -Wmissing-braces -Wparentheses -Wreorder -Wreturn-type -Wsequence-point -Wsign-compare -Wstrict-overflow=1 -Wswitch -Wtrigraphs -Wuninitialized -Wunused-label -Wunused-variable -Wvolatile-register-var -Wno-extra -fPIC $(DEFINES)
 INCPATH       = -I. -Iglm -Ibrush -Icamera -Ilib -Iscenegraph -Iui -Iglew-1.10.0/include -I../../Applications/5.7/clang_64/lib/QtOpenGL.framework/Headers -I../../Applications/5.7/clang_64/lib/QtWidgets.framework/Headers -I../../Applications/5.7/clang_64/lib/QtGui.framework/Headers -I../../Applications/5.7/clang_64/lib/QtXml.framework/Headers -I../../Applications/5.7/clang_64/lib/QtCore.framework/Headers -I. -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/System/Library/Frameworks/OpenGL.framework/Headers -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/System/Library/Frameworks/AGL.framework/Headers -I. -I../../Applications/5.7/clang_64/mkspecs/macx-g++ -F/Users/mchen16/Applications/5.7/clang_64/lib
 QMAKE         = /Users/mchen16/Applications/5.7/clang_64/bin/qmake
 DEL_FILE      = rm -f
@@ -3692,11 +3692,7 @@ causticmaker.o: materials/causticmaker.cpp materials/causticmaker.h \
 		Eigen/src/Eigenvalues/SelfAdjointEigenSolver_LAPACKE.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o causticmaker.o materials/causticmaker.cpp
 
-histogram.o: materials/histogram.cpp materials/histogram.h \
-		ui/Settings.h \
-		../../Applications/5.7/clang_64/lib/QtCore.framework/Headers/QObject \
-		../../Applications/5.7/clang_64/lib/QtCore.framework/Headers/qobject.h \
-		lib/BGRA.h
+histogram.o: materials/histogram.cpp materials/histogram.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o histogram.o materials/histogram.cpp
 
 imagereader.o: materials/imagereader.cpp materials/imagereader.h \

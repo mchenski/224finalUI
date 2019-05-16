@@ -102,10 +102,13 @@ void MainWindow::dataBind() {
 }
     connect(ui->transformButton, SIGNAL (released()),this, SLOT (transformPressed()));
     connect(ui->imageButton, SIGNAL(clicked()), SLOT(browseImage()));
+    connect(ui->maskButton, SIGNAL(clicked()), SLOT(browseMask()));
     connect(ui->backgroundButton, SIGNAL(clicked()), SLOT(browseBackground()));
     connect(ui->textureButton, SIGNAL(clicked()), SLOT(browseTexture()));
     QButtonGroup *transformationButtonGroup = new QButtonGroup;
+    QButtonGroup *BRDFButtonGroup = new QButtonGroup;
     m_buttonGroups.push_back(transformationButtonGroup);
+    m_buttonGroups.push_back(BRDFButtonGroup);
 
 //    BIND(UCharBinding::bindTextbox(
 //             ui->imageTextbox, settings.imagePath))
@@ -124,6 +127,14 @@ void MainWindow::dataBind() {
             ui->transformationTypeCaustic,
             ui->transformationTypeGlossy,
             ui->transformationTypeExtra))
+
+    BIND(ChoiceBinding::bindRadioButtons(
+            BRDFButtonGroup,
+            NUM_BRDFS,
+            settings.BRDFType,
+            ui->BRDFTypePhong,
+            ui->BRDFTypeMetallic,
+            ui->BRDFTypeOther))
 
     // Diffuse Sliders
     BIND(UCharBinding::bindSliderAndTextbox(
@@ -152,7 +163,7 @@ void MainWindow::dataBind() {
     BIND(FloatBinding::bindSliderAndTextbox(
         ui->darknessSlider, ui->darkenssTextbox, settings.darkness, 1, 5))
     BIND(FloatBinding::bindSliderAndTextbox(
-        ui->htSlider, ui->htTextbox, settings.ht, 0, 1))
+        ui->htSlider, ui->htTextbox, settings.ht, 0, 10))
 
 //    BIND(BoolBinding::bindCheckbox(ui->brushAlphaBlendingCheckbox, settings.fixAlphaBlending))
 
@@ -209,6 +220,17 @@ void MainWindow::browseImage() {
         if (ui->imageComboBox->findText(settings.imagePath) == -1)
             ui->imageComboBox->addItem(settings.imagePath);
         ui->imageComboBox->setCurrentIndex(ui->imageComboBox->findText(settings.imagePath));
+    }
+}
+
+void MainWindow::browseMask() {
+    settings.maskPath = QFileDialog::getOpenFileName(this, tr("Open File"),
+                                                    QDir::currentPath(),
+                                                    tr("Images (*.png *.xpm *.jpg)"));
+    if (!settings.maskPath.isEmpty()) {
+        if (ui->maskComboBox->findText(settings.maskPath) == -1)
+            ui->maskComboBox->addItem(settings.maskPath);
+        ui->maskComboBox->setCurrentIndex(ui->maskComboBox->findText(settings.maskPath));
     }
 }
 

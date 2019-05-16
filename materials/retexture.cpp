@@ -28,7 +28,7 @@ void Retexture::calculate(std::vector<Vector3f> T, std::vector<Vector3f> backgro
 
         int t_x = fmod(float(x) + m_s*deltaX[i], width);
         int t_y = fmod(float(y) + m_s*deltaY[i], mask.getImageHeight());
-        Vector3f t_value = T[t_y*width + t_x];
+        Vector3f t_value = T[fabs(t_y)*width + fabs(t_x)];
         Vector3f resultValue = (1.f - m_f) * t_value + m_f * image[i];
 
         float resultAverage = (resultValue[0] + resultValue[1] + resultValue[2])/3.0f;

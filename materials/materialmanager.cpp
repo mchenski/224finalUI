@@ -9,11 +9,8 @@
 #include <QProcessEnvironment>
 #include <iostream>
 #include <fstream>
-<<<<<<< HEAD
 #include "Settings.h"
-=======
 #include <cmath>
->>>>>>> da57f6a49ddafad30fcb4b67db3fbd02206a6783
 
 MaterialManager::MaterialManager()
 {
