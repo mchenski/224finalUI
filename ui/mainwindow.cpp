@@ -102,13 +102,10 @@ void MainWindow::dataBind() {
 }
     connect(ui->transformButton, SIGNAL (released()),this, SLOT (transformPressed()));
     connect(ui->imageButton, SIGNAL(clicked()), SLOT(browseImage()));
-    connect(ui->maskButton, SIGNAL (clicked()),this, SLOT (browseMask()));
     connect(ui->backgroundButton, SIGNAL(clicked()), SLOT(browseBackground()));
     connect(ui->textureButton, SIGNAL(clicked()), SLOT(browseTexture()));
     QButtonGroup *transformationButtonGroup = new QButtonGroup;
-    QButtonGroup *BRDFButtonGroup = new QButtonGroup;
     m_buttonGroups.push_back(transformationButtonGroup);
-    m_buttonGroups.push_back(BRDFButtonGroup);
 
 //    BIND(UCharBinding::bindTextbox(
 //             ui->imageTextbox, settings.imagePath))
@@ -127,14 +124,6 @@ void MainWindow::dataBind() {
             ui->transformationTypeCaustic,
             ui->transformationTypeGlossy,
             ui->transformationTypeExtra))
-
-    BIND(ChoiceBinding::bindRadioButtons(
-            BRDFButtonGroup,
-            NUM_BRDFS,
-            settings.BRDFType,
-            ui->BRDFTypePhong,
-            ui->BRDFTypeMetallic,
-            ui->BRDFTypeOther))
 
     // Diffuse Sliders
     BIND(UCharBinding::bindSliderAndTextbox(
@@ -163,7 +152,7 @@ void MainWindow::dataBind() {
     BIND(FloatBinding::bindSliderAndTextbox(
         ui->darknessSlider, ui->darkenssTextbox, settings.darkness, 1, 5))
     BIND(FloatBinding::bindSliderAndTextbox(
-        ui->htSlider, ui->htTextbox, settings.ht, 0, 10))
+        ui->htSlider, ui->htTextbox, settings.ht, 0, 1))
 
 //    BIND(BoolBinding::bindCheckbox(ui->brushAlphaBlendingCheckbox, settings.fixAlphaBlending))
 
@@ -210,10 +199,6 @@ void MainWindow::updateAspectRatio() {
 void MainWindow::settingsChanged() {
     ui->canvas2D->settingsChanged();
     std::cout << "settings changed" << std::endl;
-
-    std::cout << settings.transformationType << std::endl;
-    std::cout << settings.BRDFType << std::endl;
-
 }
 
 void MainWindow::browseImage() {
@@ -224,17 +209,6 @@ void MainWindow::browseImage() {
         if (ui->imageComboBox->findText(settings.imagePath) == -1)
             ui->imageComboBox->addItem(settings.imagePath);
         ui->imageComboBox->setCurrentIndex(ui->imageComboBox->findText(settings.imagePath));
-    }
-}
-
-void MainWindow::browseMask() {
-    settings.maskPath = QFileDialog::getOpenFileName(this, tr("Open File"),
-                                                    QDir::currentPath(),
-                                                    tr("images (*.png *.xpm *.jpg)"));
-    if (!settings.maskPath.isEmpty()) {
-        if (ui->maskComboBox->findText(settings.maskPath) == -1)
-            ui->maskComboBox->addItem(settings.maskPath);
-        ui->maskComboBox->setCurrentIndex(ui->maskComboBox->findText(settings.maskPath));
     }
 }
 
@@ -264,11 +238,11 @@ void MainWindow::transformPressed() {
     std::cout << "autobots roll out" << std::endl;
 
     MaterialManager mm;
-    mm.materialParams.backgroundFile = settings.backgroundPath;
-    mm.materialParams.mainImageFile = settings.imagePath;
+    mm.materialParams.backgroundFile = "images/background.jpg"; //settings.backgroundPath;
+    mm.materialParams.mainImageFile = "images/han.jpg"; //settings.imagePath;
     mm.materialParams.bilateralSmoothing = settings.smoothing / 100.f; //0.004f;
     mm.materialParams.curvature = settings.curvature; //1.0f;
-    mm.materialParams.maskFile = settings.maskPath;
+    mm.materialParams.maskFile = "images/han_mask.jpg";
     mm.materialParams.textureFile = settings.texturePath;
 
     mm.materialParams.diffuse = Vector3f(settings.diffuseColor.r/255.f,settings.diffuseColor.g/255.f,settings.diffuseColor.b/255.f);
@@ -281,7 +255,7 @@ void MainWindow::transformPressed() {
     mm.materialParams.darkness = settings.darkness; //1.2f;
 
     switch(settings.transformationType) {
-        case TRANSFORMATION_BRDF:            
+        case TRANSFORMATION_BRDF:
             mm.materialParams.makeMaterial = BRDF;
             break;
         case TRANSFORMATION_RETEXTURE:
@@ -292,7 +266,6 @@ void MainWindow::transformPressed() {
             break;
 
         case TRANSFORMATION_CAUSTIC:
-            mm.materialParams.causticCorners = ui->canvas2D->xyLoc;
             mm.materialParams.makeMaterial = CAUSTIC;
             break;
 
@@ -313,10 +286,6 @@ void MainWindow::transformPressed() {
         QMessageBox::critical(this, "Error", "Could not load image");
     }
 
-    if(settings.transformationType == TRANSFORMATION_CAUSTIC){
-        ui->canvas2D->xyLoc.clear();
-    }
-
     if(settings.transformationType == TRANSFORMATION_LIGHTING || settings.transformationType == TRANSFORMATION_GLASS){
         ui->canvas2D->envmapImage = mm.materialResults.image;
         ui->canvas2D->envmapNormals = mm.materialResults.normals;
@@ -327,9 +296,6 @@ void MainWindow::transformPressed() {
     } else {
         ui->canvas2D->envmapRows = -1;
         ui->canvas2D->envmapCols = -1;
-        if(ui->canvas2D->getPaintedColors().size() > 0){
-            ui->canvas2D->getPaintedColors().clear();
-        }
     }
 }
 

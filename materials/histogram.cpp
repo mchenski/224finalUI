@@ -2,7 +2,6 @@
 #include "math.h"
 #include "stdio.h"
 #include <iostream>
-#include "Settings.h"
 
 Histogram::Histogram(std::vector<float> luminances)
 {
@@ -79,7 +78,7 @@ float Histogram::findLowestSlope()
     for (int i = m_histogram.size() - 1; i >= 0; i--) {
         cutoffAccumulator += float(m_histogram[i]);
 
-        if(cutoffAccumulator/histogramAccumulator > (settings.ht / 100)){
+        if(cutoffAccumulator/histogramAccumulator > 0.005){
 
             cutoffIndex = i;
             break;
@@ -108,4 +107,39 @@ std::vector<int> Histogram::findHighlights()
 
     std::cout << "Found highlights" << std::endl;
     return highlights;
+}
+
+std::vector<float> Histogram::getHighlightsMaxAndMin()
+{
+    float lowestLog = findLowestSlope();
+    std::cout << "Lowest log: " << lowestLog << std::endl;
+    std::vector<float> highlights;
+    highlights.push_back(lowestLog);
+    float max = -10000000.f;
+    for (int i = 0; i < m_luminances.size(); i++) {
+
+        float lum = m_luminances[i];
+        if (lum > max) {
+            max = lum;
+        }
+    }
+    highlights.push_back(max);
+
+    std::cout << "Found highlights" << std::endl;
+    return highlights;
+}
+
+float Histogram::findPeakHistogramValue()
+{
+    int max = -1;
+    int max_i = -1;
+    for (int i = 0; i < m_histogram.size(); i++) {
+        if (m_histogram[i] > max) {
+            max = m_histogram[i];
+            max_i = i;
+        }
+    }
+    float lower_bound = max_i * m_binSize;
+    float upper_bound = lower_bound + m_binSize;
+    return (lower_bound + upper_bound) / 2.f;
 }
