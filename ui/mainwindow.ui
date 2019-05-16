@@ -110,7 +110,22 @@
          <number>0</number>
         </property>
         <item row="0" column="0">
-         <widget class="QWidget" name="canvas3D" native="true"/>
+         <widget class="QWidget" name="canvas3D" native="true">
+          <widget class="QWidget" name="horizontalWidget" native="true">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="geometry">
+            <rect>
+             <x>-190</x>
+             <y>190</y>
+             <width>330</width>
+             <height>2</height>
+            </rect>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_4"/>
+          </widget>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -174,6 +189,20 @@
           </property>
          </widget>
         </item>
+        <item row="1" column="2">
+         <widget class="QPushButton" name="maskButton">
+          <property name="text">
+           <string>Find</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="maskLabel">
+          <property name="text">
+           <string>Browse Mask</string>
+          </property>
+         </widget>
+        </item>
         <item row="6" column="1">
          <widget class="QComboBox" name="textureComboBox"/>
         </item>
@@ -197,6 +226,9 @@
           </property>
          </widget>
         </item>
+        <item row="1" column="1">
+         <widget class="QComboBox" name="maskComboBox"/>
+        </item>
         <item row="6" column="2">
          <widget class="QPushButton" name="textureButton">
           <property name="text">
@@ -218,81 +250,121 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
-         <widget class="QComboBox" name="maskComboBox"/>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="maskLabel">
-          <property name="text">
-           <string>Browse Mask</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QPushButton" name="maskButton">
-          <property name="text">
-           <string>Find</string>
-          </property>
-         </widget>
-        </item>
        </layout>
       </widget>
      </item>
      <item>
-      <widget class="QGroupBox" name="transformationType">
-       <property name="title">
-        <string>Transformation Type</string>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <property name="topMargin">
-         <number>5</number>
-        </property>
-        <property name="bottomMargin">
-         <number>5</number>
-        </property>
+      <widget class="QGroupBox" name="horizontalGroupBox">
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
         <item>
-         <widget class="QRadioButton" name="transformationTypeBRDF">
-          <property name="text">
-           <string>BRDF</string>
+         <widget class="QGroupBox" name="transformationType">
+          <property name="maximumSize">
+           <size>
+            <width>147</width>
+            <height>16777215</height>
+           </size>
           </property>
-          <property name="checked">
-           <bool>true</bool>
+          <property name="title">
+           <string>Transformation Type</string>
           </property>
+          <layout class="QVBoxLayout" name="verticalLayout">
+           <property name="topMargin">
+            <number>5</number>
+           </property>
+           <property name="bottomMargin">
+            <number>5</number>
+           </property>
+           <item>
+            <widget class="QRadioButton" name="transformationTypeBRDF">
+             <property name="text">
+              <string>BRDF</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="transformationTypeRetexture">
+             <property name="text">
+              <string>Retexture</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="transformationTypeGlass">
+             <property name="text">
+              <string>Glass</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="transformationTypeCaustic">
+             <property name="text">
+              <string>Caustic</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="transformationTypeGlossy">
+             <property name="text">
+              <string>Glossy</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="transformationTypeExtra">
+             <property name="text">
+              <string>Lighting</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </item>
         <item>
-         <widget class="QRadioButton" name="transformationTypeRetexture">
-          <property name="text">
-           <string>Retexture</string>
+         <widget class="QGroupBox" name="BRDFType">
+          <property name="maximumSize">
+           <size>
+            <width>147</width>
+            <height>16777215</height>
+           </size>
           </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="transformationTypeGlass">
-          <property name="text">
-           <string>Glass</string>
+          <property name="title">
+           <string>BRDF Type</string>
           </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="transformationTypeCaustic">
-          <property name="text">
-           <string>Caustic</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="transformationTypeGlossy">
-          <property name="text">
-           <string>Glossy</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="transformationTypeExtra">
-          <property name="text">
-           <string>Extra</string>
-          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <property name="topMargin">
+            <number>5</number>
+           </property>
+           <property name="bottomMargin">
+            <number>5</number>
+           </property>
+           <item>
+            <widget class="QRadioButton" name="BRDFTypePhong">
+             <property name="text">
+              <string>Phong</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="BRDFTypeMetallic">
+             <property name="text">
+              <string>Metallic</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="BRDFTypeOther">
+             <property name="text">
+              <string>Other</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </item>
        </layout>
@@ -313,20 +385,6 @@
         <property name="verticalSpacing">
          <number>5</number>
         </property>
-        <item row="1" column="0">
-         <widget class="QLabel" name="diffuseColorLabelGreen">
-          <property name="text">
-           <string>G</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="diffuseColorLabelRed">
-          <property name="text">
-           <string>R</string>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="3">
          <widget class="QLineEdit" name="diffuseColorTextboxGreen">
           <property name="minimumSize">
@@ -340,6 +398,42 @@
             <width>50</width>
             <height>16777215</height>
            </size>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="QLineEdit" name="diffuseColorTextboxRed">
+          <property name="minimumSize">
+           <size>
+            <width>50</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>50</width>
+            <height>16777215</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QSlider" name="diffuseColorSliderRed">
+          <property name="minimumSize">
+           <size>
+            <width>100</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="diffuseColorLabelRed">
+          <property name="text">
+           <string>R</string>
           </property>
          </widget>
         </item>
@@ -379,19 +473,6 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="2">
-         <widget class="QSlider" name="diffuseColorSliderRed">
-          <property name="minimumSize">
-           <size>
-            <width>100</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
         <item row="2" column="2">
          <widget class="QSlider" name="diffuseColorSliderBlue">
           <property name="minimumSize">
@@ -405,19 +486,10 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="3">
-         <widget class="QLineEdit" name="diffuseColorTextboxRed">
-          <property name="minimumSize">
-           <size>
-            <width>50</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>50</width>
-            <height>16777215</height>
-           </size>
+        <item row="1" column="0">
+         <widget class="QLabel" name="diffuseColorLabelGreen">
+          <property name="text">
+           <string>G</string>
           </property>
          </widget>
         </item>

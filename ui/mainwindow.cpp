@@ -106,7 +106,9 @@ void MainWindow::dataBind() {
     connect(ui->backgroundButton, SIGNAL(clicked()), SLOT(browseBackground()));
     connect(ui->textureButton, SIGNAL(clicked()), SLOT(browseTexture()));
     QButtonGroup *transformationButtonGroup = new QButtonGroup;
+    QButtonGroup *BRDFButtonGroup = new QButtonGroup;
     m_buttonGroups.push_back(transformationButtonGroup);
+    m_buttonGroups.push_back(BRDFButtonGroup);
 
 //    BIND(UCharBinding::bindTextbox(
 //             ui->imageTextbox, settings.imagePath))
@@ -125,6 +127,14 @@ void MainWindow::dataBind() {
             ui->transformationTypeCaustic,
             ui->transformationTypeGlossy,
             ui->transformationTypeExtra))
+
+    BIND(ChoiceBinding::bindRadioButtons(
+            BRDFButtonGroup,
+            NUM_BRDFS,
+            settings.BRDFType,
+            ui->BRDFTypePhong,
+            ui->BRDFTypeMetallic,
+            ui->BRDFTypeOther))
 
     // Diffuse Sliders
     BIND(UCharBinding::bindSliderAndTextbox(
@@ -200,6 +210,10 @@ void MainWindow::updateAspectRatio() {
 void MainWindow::settingsChanged() {
     ui->canvas2D->settingsChanged();
     std::cout << "settings changed" << std::endl;
+
+    std::cout << settings.transformationType << std::endl;
+    std::cout << settings.BRDFType << std::endl;
+
 }
 
 void MainWindow::browseImage() {

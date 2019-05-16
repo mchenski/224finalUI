@@ -22,6 +22,13 @@ enum Transformation_Type {
     NUM_BRUSH_TYPES
 };
 
+enum BRDF_Type {
+    BRDF_PHONG,
+    BRDF_METALLIC,
+    BRDF_OTHER,
+    NUM_BRDFS
+};
+
 // Enumeration values for the two tabs (2D, 3D) at the bottom of the Window.
 enum UITab {
     TAB_2D,
@@ -48,6 +55,7 @@ struct Settings {
 
     // Transformations
     int transformationType;      // The user's selected transformation @see TransformationType
+    int BRDFType;
     BGRA diffuseColor;
     BGRA specularColor;
     float smoothing;

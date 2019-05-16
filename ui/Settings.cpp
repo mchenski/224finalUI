@@ -29,6 +29,7 @@ void Settings::loadSettingsOrDefaults() {
 
     // Brush
     transformationType = s.value("transformationType", TRANSFORMATION_BRDF).toInt();
+    BRDFType = s.value("BRDFType", BRDF_PHONG).toInt();
     diffuseColor.r = s.value("diffuseRed", 255).toInt();
     diffuseColor.g = s.value("diffuseGreen", 255).toInt();
     diffuseColor.b = s.value("diffuseBlue", 255).toInt();
@@ -65,6 +66,7 @@ void Settings::saveSettings() {
 
     // Brush
     s.setValue("transformationType", transformationType);
+    s.setValue("BRDFType", BRDFType);
     s.setValue("diffuseRed", diffuseColor.r);
     s.setValue("diffuseGreen", diffuseColor.g);
     s.setValue("diffuseBlue", diffuseColor.b);

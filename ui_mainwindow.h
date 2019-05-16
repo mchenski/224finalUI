@@ -17,6 +17,7 @@
 #include <QtWidgets/QDockWidget>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
+#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
@@ -55,6 +56,8 @@ public:
     QWidget *tab3D;
     QGridLayout *gridLayout_12;
     QWidget *canvas3D;
+    QWidget *horizontalWidget;
+    QHBoxLayout *horizontalLayout_4;
     QDockWidget *transformationDock;
     QWidget *transformationDockContents;
     QVBoxLayout *verticalLayout_3;
@@ -62,17 +65,19 @@ public:
     QGroupBox *files;
     QGridLayout *gridLayout_4;
     QLabel *imageLabel;
+    QPushButton *maskButton;
+    QLabel *maskLabel;
     QComboBox *textureComboBox;
     QComboBox *imageComboBox;
     QPushButton *imageButton;
     QComboBox *backgroundComboBox;
     QLabel *textureLabel;
+    QComboBox *maskComboBox;
     QPushButton *textureButton;
     QLabel *backgroundLabel;
     QPushButton *backgroundButton;
-    QComboBox *maskComboBox;
-    QLabel *maskLabel;
-    QPushButton *maskButton;
+    QGroupBox *horizontalGroupBox;
+    QHBoxLayout *horizontalLayout_6;
     QGroupBox *transformationType;
     QVBoxLayout *verticalLayout;
     QRadioButton *transformationTypeBRDF;
@@ -81,17 +86,22 @@ public:
     QRadioButton *transformationTypeCaustic;
     QRadioButton *transformationTypeGlossy;
     QRadioButton *transformationTypeExtra;
+    QGroupBox *BRDFType;
+    QVBoxLayout *verticalLayout_4;
+    QRadioButton *BRDFTypePhong;
+    QRadioButton *BRDFTypeMetallic;
+    QRadioButton *BRDFTypeOther;
     QGroupBox *diffuseColor;
     QGridLayout *gridLayout_3;
-    QLabel *diffuseColorLabelGreen;
-    QLabel *diffuseColorLabelRed;
     QLineEdit *diffuseColorTextboxGreen;
+    QLineEdit *diffuseColorTextboxRed;
+    QSlider *diffuseColorSliderRed;
+    QLabel *diffuseColorLabelRed;
     QLineEdit *diffuseColorTextboxBlue;
     QLabel *diffuseColorLabelBlue;
     QSlider *diffuseColorSliderGreen;
-    QSlider *diffuseColorSliderRed;
     QSlider *diffuseColorSliderBlue;
-    QLineEdit *diffuseColorTextboxRed;
+    QLabel *diffuseColorLabelGreen;
     QGroupBox *specularColor;
     QGridLayout *gridLayout_19;
     QLabel *specularColorLabelBlue;
@@ -197,6 +207,14 @@ public:
         gridLayout_12->setContentsMargins(0, 0, 0, 0);
         canvas3D = new QWidget(tab3D);
         canvas3D->setObjectName(QStringLiteral("canvas3D"));
+        horizontalWidget = new QWidget(canvas3D);
+        horizontalWidget->setObjectName(QStringLiteral("horizontalWidget"));
+        horizontalWidget->setEnabled(true);
+        horizontalWidget->setGeometry(QRect(-190, 190, 330, 2));
+        horizontalLayout_4 = new QHBoxLayout(horizontalWidget);
+        horizontalLayout_4->setSpacing(6);
+        horizontalLayout_4->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_4->setObjectName(QStringLiteral("horizontalLayout_4"));
 
         gridLayout_12->addWidget(canvas3D, 0, 0, 1, 1);
 
@@ -240,6 +258,16 @@ public:
 
         gridLayout_4->addWidget(imageLabel, 0, 0, 1, 1);
 
+        maskButton = new QPushButton(files);
+        maskButton->setObjectName(QStringLiteral("maskButton"));
+
+        gridLayout_4->addWidget(maskButton, 1, 2, 1, 1);
+
+        maskLabel = new QLabel(files);
+        maskLabel->setObjectName(QStringLiteral("maskLabel"));
+
+        gridLayout_4->addWidget(maskLabel, 1, 0, 1, 1);
+
         textureComboBox = new QComboBox(files);
         textureComboBox->setObjectName(QStringLiteral("textureComboBox"));
 
@@ -265,6 +293,11 @@ public:
 
         gridLayout_4->addWidget(textureLabel, 6, 0, 1, 1);
 
+        maskComboBox = new QComboBox(files);
+        maskComboBox->setObjectName(QStringLiteral("maskComboBox"));
+
+        gridLayout_4->addWidget(maskComboBox, 1, 1, 1, 1);
+
         textureButton = new QPushButton(files);
         textureButton->setObjectName(QStringLiteral("textureButton"));
 
@@ -280,26 +313,18 @@ public:
 
         gridLayout_4->addWidget(backgroundButton, 4, 2, 1, 1);
 
-        maskComboBox = new QComboBox(files);
-        maskComboBox->setObjectName(QStringLiteral("maskComboBox"));
-
-        gridLayout_4->addWidget(maskComboBox, 1, 1, 1, 1);
-
-        maskLabel = new QLabel(files);
-        maskLabel->setObjectName(QStringLiteral("maskLabel"));
-
-        gridLayout_4->addWidget(maskLabel, 1, 0, 1, 1);
-
-        maskButton = new QPushButton(files);
-        maskButton->setObjectName(QStringLiteral("maskButton"));
-
-        gridLayout_4->addWidget(maskButton, 1, 2, 1, 1);
-
 
         verticalLayout_3->addWidget(files);
 
-        transformationType = new QGroupBox(transformationDockContents);
+        horizontalGroupBox = new QGroupBox(transformationDockContents);
+        horizontalGroupBox->setObjectName(QStringLiteral("horizontalGroupBox"));
+        horizontalLayout_6 = new QHBoxLayout(horizontalGroupBox);
+        horizontalLayout_6->setSpacing(6);
+        horizontalLayout_6->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_6->setObjectName(QStringLiteral("horizontalLayout_6"));
+        transformationType = new QGroupBox(horizontalGroupBox);
         transformationType->setObjectName(QStringLiteral("transformationType"));
+        transformationType->setMaximumSize(QSize(147, 16777215));
         verticalLayout = new QVBoxLayout(transformationType);
         verticalLayout->setSpacing(6);
         verticalLayout->setContentsMargins(11, 11, 11, 11);
@@ -337,7 +362,37 @@ public:
         verticalLayout->addWidget(transformationTypeExtra);
 
 
-        verticalLayout_3->addWidget(transformationType);
+        horizontalLayout_6->addWidget(transformationType);
+
+        BRDFType = new QGroupBox(horizontalGroupBox);
+        BRDFType->setObjectName(QStringLiteral("BRDFType"));
+        BRDFType->setMaximumSize(QSize(147, 16777215));
+        verticalLayout_4 = new QVBoxLayout(BRDFType);
+        verticalLayout_4->setSpacing(6);
+        verticalLayout_4->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_4->setObjectName(QStringLiteral("verticalLayout_4"));
+        verticalLayout_4->setContentsMargins(-1, 5, -1, 5);
+        BRDFTypePhong = new QRadioButton(BRDFType);
+        BRDFTypePhong->setObjectName(QStringLiteral("BRDFTypePhong"));
+        BRDFTypePhong->setChecked(true);
+
+        verticalLayout_4->addWidget(BRDFTypePhong);
+
+        BRDFTypeMetallic = new QRadioButton(BRDFType);
+        BRDFTypeMetallic->setObjectName(QStringLiteral("BRDFTypeMetallic"));
+
+        verticalLayout_4->addWidget(BRDFTypeMetallic);
+
+        BRDFTypeOther = new QRadioButton(BRDFType);
+        BRDFTypeOther->setObjectName(QStringLiteral("BRDFTypeOther"));
+
+        verticalLayout_4->addWidget(BRDFTypeOther);
+
+
+        horizontalLayout_6->addWidget(BRDFType);
+
+
+        verticalLayout_3->addWidget(horizontalGroupBox);
 
         diffuseColor = new QGroupBox(transformationDockContents);
         diffuseColor->setObjectName(QStringLiteral("diffuseColor"));
@@ -347,22 +402,31 @@ public:
         gridLayout_3->setObjectName(QStringLiteral("gridLayout_3"));
         gridLayout_3->setVerticalSpacing(5);
         gridLayout_3->setContentsMargins(-1, 5, -1, 5);
-        diffuseColorLabelGreen = new QLabel(diffuseColor);
-        diffuseColorLabelGreen->setObjectName(QStringLiteral("diffuseColorLabelGreen"));
-
-        gridLayout_3->addWidget(diffuseColorLabelGreen, 1, 0, 1, 1);
-
-        diffuseColorLabelRed = new QLabel(diffuseColor);
-        diffuseColorLabelRed->setObjectName(QStringLiteral("diffuseColorLabelRed"));
-
-        gridLayout_3->addWidget(diffuseColorLabelRed, 0, 0, 1, 1);
-
         diffuseColorTextboxGreen = new QLineEdit(diffuseColor);
         diffuseColorTextboxGreen->setObjectName(QStringLiteral("diffuseColorTextboxGreen"));
         diffuseColorTextboxGreen->setMinimumSize(QSize(50, 0));
         diffuseColorTextboxGreen->setMaximumSize(QSize(50, 16777215));
 
         gridLayout_3->addWidget(diffuseColorTextboxGreen, 1, 3, 1, 1);
+
+        diffuseColorTextboxRed = new QLineEdit(diffuseColor);
+        diffuseColorTextboxRed->setObjectName(QStringLiteral("diffuseColorTextboxRed"));
+        diffuseColorTextboxRed->setMinimumSize(QSize(50, 0));
+        diffuseColorTextboxRed->setMaximumSize(QSize(50, 16777215));
+
+        gridLayout_3->addWidget(diffuseColorTextboxRed, 0, 3, 1, 1);
+
+        diffuseColorSliderRed = new QSlider(diffuseColor);
+        diffuseColorSliderRed->setObjectName(QStringLiteral("diffuseColorSliderRed"));
+        diffuseColorSliderRed->setMinimumSize(QSize(100, 0));
+        diffuseColorSliderRed->setOrientation(Qt::Horizontal);
+
+        gridLayout_3->addWidget(diffuseColorSliderRed, 0, 2, 1, 1);
+
+        diffuseColorLabelRed = new QLabel(diffuseColor);
+        diffuseColorLabelRed->setObjectName(QStringLiteral("diffuseColorLabelRed"));
+
+        gridLayout_3->addWidget(diffuseColorLabelRed, 0, 0, 1, 1);
 
         diffuseColorTextboxBlue = new QLineEdit(diffuseColor);
         diffuseColorTextboxBlue->setObjectName(QStringLiteral("diffuseColorTextboxBlue"));
@@ -383,13 +447,6 @@ public:
 
         gridLayout_3->addWidget(diffuseColorSliderGreen, 1, 2, 1, 1);
 
-        diffuseColorSliderRed = new QSlider(diffuseColor);
-        diffuseColorSliderRed->setObjectName(QStringLiteral("diffuseColorSliderRed"));
-        diffuseColorSliderRed->setMinimumSize(QSize(100, 0));
-        diffuseColorSliderRed->setOrientation(Qt::Horizontal);
-
-        gridLayout_3->addWidget(diffuseColorSliderRed, 0, 2, 1, 1);
-
         diffuseColorSliderBlue = new QSlider(diffuseColor);
         diffuseColorSliderBlue->setObjectName(QStringLiteral("diffuseColorSliderBlue"));
         diffuseColorSliderBlue->setMinimumSize(QSize(100, 0));
@@ -397,12 +454,10 @@ public:
 
         gridLayout_3->addWidget(diffuseColorSliderBlue, 2, 2, 1, 1);
 
-        diffuseColorTextboxRed = new QLineEdit(diffuseColor);
-        diffuseColorTextboxRed->setObjectName(QStringLiteral("diffuseColorTextboxRed"));
-        diffuseColorTextboxRed->setMinimumSize(QSize(50, 0));
-        diffuseColorTextboxRed->setMaximumSize(QSize(50, 16777215));
+        diffuseColorLabelGreen = new QLabel(diffuseColor);
+        diffuseColorLabelGreen->setObjectName(QStringLiteral("diffuseColorLabelGreen"));
 
-        gridLayout_3->addWidget(diffuseColorTextboxRed, 0, 3, 1, 1);
+        gridLayout_3->addWidget(diffuseColorLabelGreen, 1, 0, 1, 1);
 
 
         verticalLayout_3->addWidget(diffuseColor);
@@ -686,24 +741,28 @@ public:
         transformButton->setText(QApplication::translate("MainWindow", "Transform", Q_NULLPTR));
         files->setTitle(QApplication::translate("MainWindow", "Files", Q_NULLPTR));
         imageLabel->setText(QApplication::translate("MainWindow", "Browse Image", Q_NULLPTR));
+        maskButton->setText(QApplication::translate("MainWindow", "Find", Q_NULLPTR));
+        maskLabel->setText(QApplication::translate("MainWindow", "Browse Mask", Q_NULLPTR));
         imageButton->setText(QApplication::translate("MainWindow", "Find", Q_NULLPTR));
         textureLabel->setText(QApplication::translate("MainWindow", "Browse Texture", Q_NULLPTR));
         textureButton->setText(QApplication::translate("MainWindow", "Find", Q_NULLPTR));
         backgroundLabel->setText(QApplication::translate("MainWindow", "Browse Background", Q_NULLPTR));
         backgroundButton->setText(QApplication::translate("MainWindow", "Find", Q_NULLPTR));
-        maskLabel->setText(QApplication::translate("MainWindow", "Browse Mask", Q_NULLPTR));
-        maskButton->setText(QApplication::translate("MainWindow", "Find", Q_NULLPTR));
         transformationType->setTitle(QApplication::translate("MainWindow", "Transformation Type", Q_NULLPTR));
         transformationTypeBRDF->setText(QApplication::translate("MainWindow", "BRDF", Q_NULLPTR));
         transformationTypeRetexture->setText(QApplication::translate("MainWindow", "Retexture", Q_NULLPTR));
         transformationTypeGlass->setText(QApplication::translate("MainWindow", "Glass", Q_NULLPTR));
         transformationTypeCaustic->setText(QApplication::translate("MainWindow", "Caustic", Q_NULLPTR));
         transformationTypeGlossy->setText(QApplication::translate("MainWindow", "Glossy", Q_NULLPTR));
-        transformationTypeExtra->setText(QApplication::translate("MainWindow", "Extra", Q_NULLPTR));
+        transformationTypeExtra->setText(QApplication::translate("MainWindow", "Lighting", Q_NULLPTR));
+        BRDFType->setTitle(QApplication::translate("MainWindow", "BRDF Type", Q_NULLPTR));
+        BRDFTypePhong->setText(QApplication::translate("MainWindow", "Phong", Q_NULLPTR));
+        BRDFTypeMetallic->setText(QApplication::translate("MainWindow", "Metallic", Q_NULLPTR));
+        BRDFTypeOther->setText(QApplication::translate("MainWindow", "Other", Q_NULLPTR));
         diffuseColor->setTitle(QApplication::translate("MainWindow", "Diffuse", Q_NULLPTR));
-        diffuseColorLabelGreen->setText(QApplication::translate("MainWindow", "G", Q_NULLPTR));
         diffuseColorLabelRed->setText(QApplication::translate("MainWindow", "R", Q_NULLPTR));
         diffuseColorLabelBlue->setText(QApplication::translate("MainWindow", "B", Q_NULLPTR));
+        diffuseColorLabelGreen->setText(QApplication::translate("MainWindow", "G", Q_NULLPTR));
         specularColor->setTitle(QApplication::translate("MainWindow", "Specular", Q_NULLPTR));
         specularColorLabelBlue->setText(QApplication::translate("MainWindow", "B", Q_NULLPTR));
         specularColorLabelGreen->setText(QApplication::translate("MainWindow", "G", Q_NULLPTR));
