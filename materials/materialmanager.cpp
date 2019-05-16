@@ -9,6 +9,7 @@
 #include <QProcessEnvironment>
 #include <iostream>
 #include <fstream>
+#include "Settings.h"
 
 MaterialManager::MaterialManager()
 {
@@ -325,7 +326,14 @@ bool MaterialManager::makeGlass(){
     retextureObj.m_glassColor = materialParams.glassColor;
     retextureObj.m_darkness = materialParams.darkness;
 
-    std::vector<Vector3f> blurred = retextureObj.applyGaussianFilter(inpainting, cols, rows, retextureObj.m_frosty);
+    std::vector<Vector3f> blurred;
+    int notEqual = QString::compare(settings.imagePath, settings.backgroundPath, Qt::CaseInsensitive);
+    if (notEqual == 0) {
+        blurred = retextureObj.applyGaussianFilter(inpainting, cols, rows, retextureObj.m_frosty);
+    } else {
+        blurred = retextureObj.applyGaussianFilter(background.toVector(), cols, rows, retextureObj.m_frosty);
+    }
+
     vectorToFile(blurred, "images/inpaintBlur.png", rows, cols);
 
     std::vector<Vector3f> retexturing;
