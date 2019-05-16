@@ -9,6 +9,7 @@
 #include <QProcessEnvironment>
 #include <iostream>
 #include <fstream>
+#include "Settings.h"
 
 MaterialManager::MaterialManager()
 {
@@ -142,6 +143,11 @@ bool MaterialManager::changeBrdf(){
     if(!areBrdfParamsValid()){
         return false;
     }
+    if(settings.BRDFType == BRDF_PHONG){
+        br.brdf_type = 0;
+    } else if(settings.BRDFType == BRDF_METALLIC){
+        br.brdf_type = 1;
+    }
     br.m_diffuse = materialParams.diffuse;
     br.m_specular = materialParams.specular;
 
@@ -190,6 +196,11 @@ bool MaterialManager::changeLighting(){
 
     if(!areBrdfParamsValid()){
         return false;
+    }
+    if(settings.BRDFType == BRDF_PHONG){
+        br.brdf_type = 0;
+    } else if(settings.BRDFType == BRDF_METALLIC){
+        br.brdf_type = 1;
     }
     br.m_diffuse = Vector3f(0.0f,0.0f,0.0f);
     br.m_specular = Vector3f(1.0f,1.0f,1.0f);
@@ -338,6 +349,11 @@ bool MaterialManager::makeGlass(){
     materialResults.cols = cols;
 
     BrdfReplacement br;
+    if(settings.BRDFType == BRDF_PHONG){
+        br.brdf_type = 0;
+    } else if(settings.BRDFType == BRDF_METALLIC){
+        br.brdf_type = 1;
+    }
     br.replaceBrdf(retexturing, mask.toVector(), normals, rows, cols);
     materialResults.specularDirs = br.specularDirs;
 

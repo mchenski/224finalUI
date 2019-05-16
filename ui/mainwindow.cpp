@@ -281,7 +281,7 @@ void MainWindow::transformPressed() {
     mm.materialParams.darkness = settings.darkness; //1.2f;
 
     switch(settings.transformationType) {
-        case TRANSFORMATION_BRDF:
+        case TRANSFORMATION_BRDF:            
             mm.materialParams.makeMaterial = BRDF;
             break;
         case TRANSFORMATION_RETEXTURE:

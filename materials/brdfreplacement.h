@@ -62,6 +62,7 @@ public:
     int m_maskArea = 0;
     int sampleNum = 0;
 
+    int brdf_type = 0;
 
     std::vector<SHSample> m_samples;
 };
