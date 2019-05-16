@@ -44,6 +44,8 @@ public:
     void writeDesiredToFile(std::string filename, std::vector<float> data);
     void saveEnvmap(std::vector<Eigen::Vector3f> sampledColors);
     void getNewEnvmap(std::string filename, Eigen::VectorXf &envmapChannel);
+    Vector3f brdf(Vector3f sampleDir, Vector3f V, Vector3f objectNormal, int type);
+
     std::vector<int> us;
     std::vector<int> vs;
     Eigen::MatrixXf reds;
@@ -61,11 +63,6 @@ public:
     int sampleNum = 0;
 
 
-    float SH(int l, int m, float theta, float phi);
-    float K(int l, int m);
-    int factorial(int n);
-    float P(int l, int m, float x);
-    void samples(std::vector<SHSample> &samples);
     std::vector<SHSample> m_samples;
 };
 

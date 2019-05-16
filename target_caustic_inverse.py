@@ -160,7 +160,6 @@ for i in range(0, image.shape[0]):
 				image[i,j] = -2
 startImageFFT = fft.fft2(image) 
 phaseSymmetryStart = calculatePhaseSymmetry(startImageFFT, phaseSymmetry, symmetryTotal, amplitudeTotal)
-
 f = open("caustic_data.txt", "w")
 for i in range(phaseSymmetryStart.shape[0]):
 	for j in range(phaseSymmetryStart.shape[1]):

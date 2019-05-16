@@ -46,6 +46,9 @@ public:
     Eigen::Vector2f highlight = Eigen::Vector2f(-1,-1);
     std::vector<Eigen::Vector3f> m_highlightColors;
 
+    //caustics
+    std::vector<int> xyLoc;
+
 public slots:
     // UI will call this from the button on the "Ray" dock
     void cancelRender();

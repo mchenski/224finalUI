@@ -47,6 +47,9 @@ struct MaterialParams{
     std::vector<Vector3f> highlightColors;
     Vector2f highlight;
 
+    //caustics
+    std::vector<int> causticCorners;
+
     MaterialChangeType makeMaterial = BRDF;
 };
 

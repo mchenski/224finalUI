@@ -266,6 +266,7 @@ void MainWindow::transformPressed() {
             break;
 
         case TRANSFORMATION_CAUSTIC:
+            mm.materialParams.causticCorners = ui->canvas2D->xyLoc;
             mm.materialParams.makeMaterial = CAUSTIC;
             break;
 
@@ -284,6 +285,10 @@ void MainWindow::transformPressed() {
 
     if (!ui->canvas2D->loadImage("images/output.png")) {
         QMessageBox::critical(this, "Error", "Could not load image");
+    }
+
+    if(settings.transformationType == TRANSFORMATION_CAUSTIC){
+        ui->canvas2D->xyLoc.clear();
     }
 
     if(settings.transformationType == TRANSFORMATION_LIGHTING || settings.transformationType == TRANSFORMATION_GLASS){

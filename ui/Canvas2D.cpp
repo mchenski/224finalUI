@@ -60,6 +60,14 @@ void Canvas2D::mouseDown(int x, int y) {
     // need to use the actual alpha value to compute the new color of the pixel
 
 //    bool fixAlphaBlending = settings.fixAlphaBlending; // for extra/half credit
+    if(settings.transformationType == TRANSFORMATION_CAUSTIC){
+        if(xyLoc.size() >= 8){
+            xyLoc.erase(xyLoc.begin());
+            xyLoc.erase(xyLoc.begin());
+        }
+        xyLoc.push_back(x);
+        xyLoc.push_back(y);
+    }
 
 }
 

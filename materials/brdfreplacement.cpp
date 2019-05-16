@@ -18,7 +18,7 @@
 #include <QProcessEnvironment>
 #include <map>
 
-#define OPTIMIZE 1
+#define OPTIMIZE 0
 using namespace Eigen;
 using namespace std;
 BrdfReplacement::BrdfReplacement()
@@ -33,78 +33,6 @@ BrdfReplacement::BrdfReplacement()
 //    }
     //samples(m_samples);
 
-}
-
-void BrdfReplacement::samples(std::vector<SHSample> &samples){
-    int i = 0;
-    int bands = 2;
-    for(int a = 0; a < 20; a++){
-        for(int b = 0; b < 20; b++){
-            float x = (a + float(rand())/RAND_MAX) / 20.0f;
-            float y = (b + float(rand())/RAND_MAX) / 20.0f;
-            float theta = 2.0 * acos(sqrtf(1.0f - x));
-            float phi = 2.0f * M_PI * y;
-            samples[i].sph = Vector3f(theta, phi, 1.0f);
-            samples[i].vec = Vector3f(sin(theta) * cos(phi), sin(theta)* sin(phi), cos(theta));
-            for(int l = 0; l < bands; l++){
-                for(int m = -l; m <= l; m++){
-                    samples[i].coeff.push_back(SH(l, m, theta, phi));
-                }
-            }
-            std::cout << i << std::endl;
-            i += 1;
-
-        }
-    }
-}
-
-float BrdfReplacement::P(int l, int m, float x){
-    float pmm = 1.0f;
-    if(m > 0){
-        float somx2 = sqrtf((1.0f - x) * (1.0f + x));
-        float fact = 1.0f;
-        for(int i = 1; i <= m; i++){
-            pmm *= (-fact) * somx2;
-            fact += 2.0f;
-        }
-    }
-    if (l == m){
-        return pmm;
-    }
-    float pmmp1 = x * (2.0f * m + 1.0f) * pmm;
-    if( l == (m + 1)){
-        return pmmp1;
-    }
-    float pll = 0.0f;
-    for(int ll = m + 2; ll <= l; l++){
-        pll = ( (2.0 * ll - 1.0) * x * pmmp1 - (ll + m - 1.0f) * pmm) / (ll - m);
-        pmm = pmmp1;
-        pmmp1 = pll;
-    }
-    return pll;
-}
-
-int BrdfReplacement::factorial(int n)
-{
-  return (n == 1 || n == 0) ? 1 : factorial(n - 1) * n;
-}
-
-float BrdfReplacement::K(int l, int m){
-    float temp = ((2.0f * float(l) + 1.0f) * factorial(l - m)) / (4.0 * M_PI * factorial(l + m));
-    return sqrtf(temp);
-}
-
-float BrdfReplacement::SH(int l, int m, float theta, float phi){
-    float sqrt2 = sqrtf(2.0f);
-    if(m == 0){
-        return K(l, 0) * P(l, m, cos(theta));
-    }
-    else if (m > 0){
-        return sqrt2 * K(l, m) * cos(m * phi) * P(l, m, cos(theta));
-    }
-    else {
-        return sqrt2 * K(l, -m) * sin(-m * phi) * P(l, -m, cos(theta));
-    }
 }
 
 void BrdfReplacement::importanceSampling(int rows, int cols, std::vector<Vector3f> &directionVectors, std::vector<Vector3f> &sampledColors, std::vector<Vector3f> inpainting){
@@ -169,10 +97,6 @@ std::vector<Vector3f> BrdfReplacement::sample(std::vector<Vector3f> inpainting, 
                     Vector3f objectNormal = normals[objectInd];
                     objectNormal = objectNormal.normalized();
 
-                    Vector3f V = Vector3f(x - xC, rows - y - yC, 100); // theres something goin on here
-                    V = V.normalized();
-                    Vector3f refl = (sampleDir) - 2 * (objectNormal.dot(sampleDir)) * objectNormal;
-                    refl = -refl.normalized();
                     if(OPTIMIZE){
                         if(sampleDir.dot(objectNormal) > 0.0f && sampledColors[sample] != Vector3f(0,0,0)){
                             sampleCount += 1;
@@ -188,10 +112,9 @@ std::vector<Vector3f> BrdfReplacement::sample(std::vector<Vector3f> inpainting, 
                 int objectInd = y * cols + x;
                 Vector3f objectNormal = normals[objectInd];
                 objectNormal = objectNormal.normalized();
-                //if(m_solve){
-                    Vector3f specRefl = (V) - 2 * (objectNormal.dot(V)) * objectNormal;
-                    specularDirs[objectInd] = (-specRefl).normalized();
-                //}
+                Vector3f specRefl = (V) - 2 * (objectNormal.dot(V)) * objectNormal;
+                specularDirs[objectInd] = (-specRefl).normalized();
+
 
                 for(int sample = 0; sample < sampledColors.size(); sample++){
 
@@ -208,11 +131,15 @@ std::vector<Vector3f> BrdfReplacement::sample(std::vector<Vector3f> inpainting, 
 
                         float nDotL = fmin(1.0,sampleDir.dot(objectNormal));
 
-                        Vector3f refl = (sampleDir) - 2 * (objectNormal.dot(sampleDir)) * objectNormal;
-                        refl = -refl.normalized();
-                        Vector3f diffuseCoeff = color/(M_PI);
-                        Vector3f specularCoeff = specular/(M_PI) * (n + 2) * pow(fmax(0, refl.dot(V)), n);
-                        Vector3f coeff = diffuseCoeff + specularCoeff;
+//                        Vector3f refl = (sampleDir) - 2 * (objectNormal.dot(sampleDir)) * objectNormal;
+//                        refl = -refl.normalized();
+//                        Vector3f diffuseCoeff = color/(M_PI);
+//                        Vector3f specularCoeff = specular/(M_PI) * (n + 2) * pow(fmax(0, refl.dot(V)), n);
+//                        Vector3f coeff = diffuseCoeff + specularCoeff;
+
+                        Vector3f coeff = brdf(sampleDir, V, objectNormal, 0);
+
+
                         lPrime[0] += fmin(li[0] * coeff[0] * nDotL , 1.0);
                         lPrime[1] += fmin(li[1] * coeff[1]  * nDotL, 1.0);
                         lPrime[2] += fmin(li[2] * coeff[2]  * nDotL, 1.0);
@@ -260,6 +187,44 @@ std::vector<Vector3f> BrdfReplacement::sample(std::vector<Vector3f> inpainting, 
     std::cout << sampleAv/(rows * cols) << std::endl;
     std::cout << "replaced brdf" << std::endl;
     return brdfReplacement;
+}
+
+Vector3f BrdfReplacement::brdf(Vector3f sampleDir, Vector3f V, Vector3f objectNormal, int type){
+    Vector3f color = m_diffuse;
+    Vector3f specular = m_specular;
+    float n = 5;
+    if(type == 0){
+        Vector3f refl = (sampleDir) - 2 * (objectNormal.dot(sampleDir)) * objectNormal;
+        refl = -refl.normalized();
+        Vector3f diffuseCoeff = color/(M_PI);
+        Vector3f specularCoeff = specular/(M_PI) * (n + 2) * pow(fmax(0, refl.dot(V)), n);
+        return diffuseCoeff + specularCoeff;
+    } else {
+        float roughness = 0.1;
+        float r0 = 0.8;
+
+        Vector3f H = sampleDir + V;
+        H = H.normalized();
+        float ndoth = fmax(0.0f, objectNormal.dot(H));
+        float ndotv = fmax(0.0f, objectNormal.dot(V));
+        float vdoth = fmax(0.0f, sampleDir.dot(H));
+        float nDotL = fmin(1.0,sampleDir.dot(objectNormal));
+
+        float F = r0 + pow(1.0f - vdoth, 5.0f) * (1.0f - r0);
+
+        float Dnumerator = exp((ndoth * ndoth - 1.0) / (roughness * roughness * ndoth * ndoth));
+        float Ddenominator = 4.0 * roughness * roughness * pow(ndoth, 4.0);
+
+        float D = Dnumerator/Ddenominator;
+
+        float G = fmin(fmin(1.0f, (2.0 * ndoth * ndotv) / vdoth), fmin(1.0f,(2.0 * ndoth * nDotL) / vdoth));
+
+        float ks = (F * D * G) / (4 * nDotL * ndotv);
+
+        Vector3f diffuseCoeff = color/(M_PI);
+
+        return diffuseCoeff + specular * ks;
+    }
 }
 
 void BrdfReplacement::sampleSpecular(std::vector<Vector3f> &image, std::vector<Vector3f> mask, std::vector<Vector3f> normals,int rows, int cols, std::vector<Vector3f> highlights, std::vector<Vector3f> lightColors, float shiny){

@@ -399,6 +399,9 @@ bool MaterialManager::makeCaustic(){
     if(!areGlassParametersValid()){
         return false;
     }
+    if(materialParams.causticCorners.size() != 8){
+        return false;
+    }
 
     retextureObj.m_frosty = materialParams.frosty;
     retextureObj.m_s = materialParams.s;
@@ -444,7 +447,8 @@ bool MaterialManager::makeCaustic(){
     }
 
     CausticMaker cm(c, retexturing, rows, cols);
-    std::vector<Vector3f> caustic = cm.project(0,0,50,0,50,50,0,50);
+    std::vector<int> xyLoc = materialParams.causticCorners;
+    std::vector<Vector3f> caustic = cm.project(xyLoc[0],xyLoc[1],xyLoc[2],xyLoc[3],xyLoc[4],xyLoc[5],xyLoc[6],xyLoc[7]);
 
     vectorToFile(caustic, "images/output.png", rows, cols);
     return true;
