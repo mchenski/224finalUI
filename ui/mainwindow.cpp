@@ -163,7 +163,7 @@ void MainWindow::dataBind() {
     BIND(FloatBinding::bindSliderAndTextbox(
         ui->darknessSlider, ui->darkenssTextbox, settings.darkness, 1, 5))
     BIND(FloatBinding::bindSliderAndTextbox(
-        ui->htSlider, ui->htTextbox, settings.ht, 0, 1))
+        ui->htSlider, ui->htTextbox, settings.ht, 0, 10))
 
 //    BIND(BoolBinding::bindCheckbox(ui->brushAlphaBlendingCheckbox, settings.fixAlphaBlending))
 

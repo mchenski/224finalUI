@@ -2,6 +2,7 @@
 #include "math.h"
 #include "stdio.h"
 #include <iostream>
+#include "Settings.h"
 
 Histogram::Histogram(std::vector<float> luminances)
 {
@@ -78,7 +79,7 @@ float Histogram::findLowestSlope()
     for (int i = m_histogram.size() - 1; i >= 0; i--) {
         cutoffAccumulator += float(m_histogram[i]);
 
-        if(cutoffAccumulator/histogramAccumulator > 0.005){
+        if(cutoffAccumulator/histogramAccumulator > (settings.ht / 100)){
 
             cutoffIndex = i;
             break;

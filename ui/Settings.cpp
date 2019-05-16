@@ -46,7 +46,7 @@ void Settings::loadSettingsOrDefaults() {
     sValue = s.value("sValue", 50).toInt();
     frosty = s.value("frosty", 1).toInt();
     darkness = s.value("darkness", 0).toFloat();
-    ht = s.value("ht", 0).toDouble();
+    ht = s.value("ht", 0.5f).toDouble();
 
     imagePath = s.value("imagePath", "images/han.jpg").toString();
     maskPath = s.value("imagePath", "images/han_mask.jpg").toString();
