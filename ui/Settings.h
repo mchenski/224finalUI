@@ -57,6 +57,7 @@ struct Settings {
     float darkness;
     float ht;
     QString imagePath;
+    QString maskPath;
     QString backgroundPath;
     QString texturePath;
 

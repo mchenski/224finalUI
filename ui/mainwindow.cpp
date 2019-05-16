@@ -102,6 +102,7 @@ void MainWindow::dataBind() {
 }
     connect(ui->transformButton, SIGNAL (released()),this, SLOT (transformPressed()));
     connect(ui->imageButton, SIGNAL(clicked()), SLOT(browseImage()));
+    connect(ui->maskButton, SIGNAL (clicked()),this, SLOT (browseMask()));
     connect(ui->backgroundButton, SIGNAL(clicked()), SLOT(browseBackground()));
     connect(ui->textureButton, SIGNAL(clicked()), SLOT(browseTexture()));
     QButtonGroup *transformationButtonGroup = new QButtonGroup;
@@ -212,6 +213,17 @@ void MainWindow::browseImage() {
     }
 }
 
+void MainWindow::browseMask() {
+    settings.maskPath = QFileDialog::getOpenFileName(this, tr("Open File"),
+                                                    QDir::currentPath(),
+                                                    tr("images (*.png *.xpm *.jpg)"));
+    if (!settings.maskPath.isEmpty()) {
+        if (ui->maskComboBox->findText(settings.maskPath) == -1)
+            ui->maskComboBox->addItem(settings.maskPath);
+        ui->maskComboBox->setCurrentIndex(ui->maskComboBox->findText(settings.maskPath));
+    }
+}
+
 void MainWindow::browseBackground() {
     settings.backgroundPath = QFileDialog::getOpenFileName(this, tr("Open File"),
                                                     QDir::currentPath(),
@@ -238,11 +250,11 @@ void MainWindow::transformPressed() {
     std::cout << "autobots roll out" << std::endl;
 
     MaterialManager mm;
-    mm.materialParams.backgroundFile = "images/background.jpg"; //settings.backgroundPath;
-    mm.materialParams.mainImageFile = "images/han.jpg"; //settings.imagePath;
+    mm.materialParams.backgroundFile = settings.backgroundPath;
+    mm.materialParams.mainImageFile = settings.imagePath;
     mm.materialParams.bilateralSmoothing = settings.smoothing / 100.f; //0.004f;
     mm.materialParams.curvature = settings.curvature; //1.0f;
-    mm.materialParams.maskFile = "images/han_mask.jpg";
+    mm.materialParams.maskFile = settings.maskPath;
     mm.materialParams.textureFile = settings.texturePath;
 
     mm.materialParams.diffuse = Vector3f(settings.diffuseColor.r/255.f,settings.diffuseColor.g/255.f,settings.diffuseColor.b/255.f);

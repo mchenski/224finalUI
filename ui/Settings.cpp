@@ -47,8 +47,8 @@ void Settings::loadSettingsOrDefaults() {
     darkness = s.value("darkness", 0).toFloat();
     ht = s.value("ht", 0).toDouble();
 
-//    imagePath = s.value("imagePath", "images/han.jpg");
     imagePath = s.value("imagePath", "images/han.jpg").toString();
+    maskPath = s.value("imagePath", "images/han_mask.jpg").toString();
     backgroundPath = s.value("backgroundPath", "images/background.jpg").toString();
     texturePath = s.value("texturePath", "images/marble.jpg").toString();
 
@@ -84,6 +84,7 @@ void Settings::saveSettings() {
     s.setValue("ht", ht);
 
     s.setValue("imageComboValue", imagePath);
+    s.setValue("maskComboValue", maskPath);
     s.setValue("backgroundComboValue", backgroundPath);
     s.setValue("textureComboValue", texturePath);
 

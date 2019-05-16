@@ -61,15 +61,18 @@ public:
     QPushButton *transformButton;
     QGroupBox *files;
     QGridLayout *gridLayout_4;
-    QPushButton *backgroundButton;
-    QLabel *backgroundLabel;
-    QComboBox *textureComboBox;
     QLabel *imageLabel;
-    QPushButton *imageButton;
-    QLabel *textureLabel;
-    QComboBox *backgroundComboBox;
-    QPushButton *textureButton;
+    QComboBox *textureComboBox;
     QComboBox *imageComboBox;
+    QPushButton *imageButton;
+    QComboBox *backgroundComboBox;
+    QLabel *textureLabel;
+    QPushButton *textureButton;
+    QLabel *backgroundLabel;
+    QPushButton *backgroundButton;
+    QComboBox *maskComboBox;
+    QLabel *maskLabel;
+    QPushButton *maskButton;
     QGroupBox *transformationType;
     QVBoxLayout *verticalLayout;
     QRadioButton *transformationTypeBRDF;
@@ -232,50 +235,65 @@ public:
         gridLayout_4->setObjectName(QStringLiteral("gridLayout_4"));
         gridLayout_4->setVerticalSpacing(5);
         gridLayout_4->setContentsMargins(-1, 5, -1, 5);
-        backgroundButton = new QPushButton(files);
-        backgroundButton->setObjectName(QStringLiteral("backgroundButton"));
-
-        gridLayout_4->addWidget(backgroundButton, 1, 2, 1, 1);
-
-        backgroundLabel = new QLabel(files);
-        backgroundLabel->setObjectName(QStringLiteral("backgroundLabel"));
-
-        gridLayout_4->addWidget(backgroundLabel, 1, 0, 1, 1);
-
-        textureComboBox = new QComboBox(files);
-        textureComboBox->setObjectName(QStringLiteral("textureComboBox"));
-
-        gridLayout_4->addWidget(textureComboBox, 3, 1, 1, 1);
-
         imageLabel = new QLabel(files);
         imageLabel->setObjectName(QStringLiteral("imageLabel"));
 
         gridLayout_4->addWidget(imageLabel, 0, 0, 1, 1);
+
+        textureComboBox = new QComboBox(files);
+        textureComboBox->setObjectName(QStringLiteral("textureComboBox"));
+
+        gridLayout_4->addWidget(textureComboBox, 6, 1, 1, 1);
+
+        imageComboBox = new QComboBox(files);
+        imageComboBox->setObjectName(QStringLiteral("imageComboBox"));
+
+        gridLayout_4->addWidget(imageComboBox, 0, 1, 1, 1);
 
         imageButton = new QPushButton(files);
         imageButton->setObjectName(QStringLiteral("imageButton"));
 
         gridLayout_4->addWidget(imageButton, 0, 2, 1, 1);
 
-        textureLabel = new QLabel(files);
-        textureLabel->setObjectName(QStringLiteral("textureLabel"));
-
-        gridLayout_4->addWidget(textureLabel, 3, 0, 1, 1);
-
         backgroundComboBox = new QComboBox(files);
         backgroundComboBox->setObjectName(QStringLiteral("backgroundComboBox"));
 
-        gridLayout_4->addWidget(backgroundComboBox, 1, 1, 1, 1);
+        gridLayout_4->addWidget(backgroundComboBox, 4, 1, 1, 1);
+
+        textureLabel = new QLabel(files);
+        textureLabel->setObjectName(QStringLiteral("textureLabel"));
+
+        gridLayout_4->addWidget(textureLabel, 6, 0, 1, 1);
 
         textureButton = new QPushButton(files);
         textureButton->setObjectName(QStringLiteral("textureButton"));
 
-        gridLayout_4->addWidget(textureButton, 3, 2, 1, 1);
+        gridLayout_4->addWidget(textureButton, 6, 2, 1, 1);
 
-        imageComboBox = new QComboBox(files);
-        imageComboBox->setObjectName(QStringLiteral("imageComboBox"));
+        backgroundLabel = new QLabel(files);
+        backgroundLabel->setObjectName(QStringLiteral("backgroundLabel"));
 
-        gridLayout_4->addWidget(imageComboBox, 0, 1, 1, 1);
+        gridLayout_4->addWidget(backgroundLabel, 4, 0, 1, 1);
+
+        backgroundButton = new QPushButton(files);
+        backgroundButton->setObjectName(QStringLiteral("backgroundButton"));
+
+        gridLayout_4->addWidget(backgroundButton, 4, 2, 1, 1);
+
+        maskComboBox = new QComboBox(files);
+        maskComboBox->setObjectName(QStringLiteral("maskComboBox"));
+
+        gridLayout_4->addWidget(maskComboBox, 1, 1, 1, 1);
+
+        maskLabel = new QLabel(files);
+        maskLabel->setObjectName(QStringLiteral("maskLabel"));
+
+        gridLayout_4->addWidget(maskLabel, 1, 0, 1, 1);
+
+        maskButton = new QPushButton(files);
+        maskButton->setObjectName(QStringLiteral("maskButton"));
+
+        gridLayout_4->addWidget(maskButton, 1, 2, 1, 1);
 
 
         verticalLayout_3->addWidget(files);
@@ -667,12 +685,14 @@ public:
         transformationDock->setWindowTitle(QApplication::translate("MainWindow", "Br&ush", Q_NULLPTR));
         transformButton->setText(QApplication::translate("MainWindow", "Transform", Q_NULLPTR));
         files->setTitle(QApplication::translate("MainWindow", "Files", Q_NULLPTR));
-        backgroundButton->setText(QApplication::translate("MainWindow", "Find", Q_NULLPTR));
-        backgroundLabel->setText(QApplication::translate("MainWindow", "Browse Background", Q_NULLPTR));
         imageLabel->setText(QApplication::translate("MainWindow", "Browse Image", Q_NULLPTR));
         imageButton->setText(QApplication::translate("MainWindow", "Find", Q_NULLPTR));
         textureLabel->setText(QApplication::translate("MainWindow", "Browse Texture", Q_NULLPTR));
         textureButton->setText(QApplication::translate("MainWindow", "Find", Q_NULLPTR));
+        backgroundLabel->setText(QApplication::translate("MainWindow", "Browse Background", Q_NULLPTR));
+        backgroundButton->setText(QApplication::translate("MainWindow", "Find", Q_NULLPTR));
+        maskLabel->setText(QApplication::translate("MainWindow", "Browse Mask", Q_NULLPTR));
+        maskButton->setText(QApplication::translate("MainWindow", "Find", Q_NULLPTR));
         transformationType->setTitle(QApplication::translate("MainWindow", "Transformation Type", Q_NULLPTR));
         transformationTypeBRDF->setText(QApplication::translate("MainWindow", "BRDF", Q_NULLPTR));
         transformationTypeRetexture->setText(QApplication::translate("MainWindow", "Retexture", Q_NULLPTR));

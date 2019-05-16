@@ -65,6 +65,7 @@ public slots:
     void transformPressed();
 
     void browseImage();
+    void browseMask();
     void browseBackground();
     void browseTexture();
 
