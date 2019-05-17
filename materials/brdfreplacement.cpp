@@ -17,7 +17,7 @@
 #include <QProcess>
 #include <QProcessEnvironment>
 #include <map>
-
+#include "Settings.h"
 #define OPTIMIZE 1
 using namespace Eigen;
 using namespace std;
@@ -56,6 +56,7 @@ void BrdfReplacement::importanceSampling(int rows, int cols, std::vector<Vector3
         vs.push_back(v);
         sampledColors.push_back(inpainting[v * cols + u]);
     }
+    lc = reduceSHLights(directionVectors, sampledColors);
 
     MatrixXf l_reds(m_maskArea, sampleNum);
     reds = l_reds;
@@ -115,7 +116,6 @@ std::vector<Vector3f> BrdfReplacement::sample(std::vector<Vector3f> inpainting, 
                 Vector3f specRefl = (V) - 2 * (objectNormal.dot(V)) * objectNormal;
                 specularDirs[objectInd] = (-specRefl).normalized();
 
-
                 for(int sample = 0; sample < sampledColors.size(); sample++){
 
 
@@ -130,20 +130,18 @@ std::vector<Vector3f> BrdfReplacement::sample(std::vector<Vector3f> inpainting, 
                         pixelToSampleIds[objectInd].push_back(sample);
 
                         float nDotL = fmin(1.0,sampleDir.dot(objectNormal));
+                        Vector3f coeff = brdf(sampleDir, V, objectNormal, brdf_type, Vector3f(sample,sample,sample));
+                        if(brdf_type == 2){
 
-//                        Vector3f refl = (sampleDir) - 2 * (objectNormal.dot(sampleDir)) * objectNormal;
-//                        refl = -refl.normalized();
-//                        Vector3f diffuseCoeff = color/(M_PI);
-//                        Vector3f specularCoeff = specular/(M_PI) * (n + 2) * pow(fmax(0, refl.dot(V)), n);
-//                        Vector3f coeff = diffuseCoeff + specularCoeff;
+                            lPrime[0] += coeff[0];
+                            lPrime[1] += coeff[1];
+                            lPrime[2] += coeff[2];
+                        } else {
 
-                        Vector3f coeff = brdf(sampleDir, V, objectNormal, brdf_type);
-
-
-                        lPrime[0] += fmin(li[0] * coeff[0] * nDotL , 1.0);
-                        lPrime[1] += fmin(li[1] * coeff[1]  * nDotL, 1.0);
-                        lPrime[2] += fmin(li[2] * coeff[2]  * nDotL, 1.0);
-
+                            lPrime[0] += fmin(li[0] * coeff[0] * nDotL , 1.0);
+                            lPrime[1] += fmin(li[1] * coeff[1]  * nDotL, 1.0);
+                            lPrime[2] += fmin(li[2] * coeff[2]  * nDotL, 1.0);
+                        }
                         if(m_solve){
                             float pdf = 1.0f/(M_PI * 2.0f);
                             if(OPTIMIZE){
@@ -174,8 +172,10 @@ std::vector<Vector3f> BrdfReplacement::sample(std::vector<Vector3f> inpainting, 
                 if(sampleCount > 0){
                     float pdf = 1.0f/(M_PI * 2.0f);
                     lPrime = 255 * (lPrime/pdf) / sampleCount;
+
                     sampleAv += sampleCount;
                 }
+                //}
                 brdfReplacement.push_back(lPrime);
                 maskInd += 1;
             } else {
@@ -189,7 +189,7 @@ std::vector<Vector3f> BrdfReplacement::sample(std::vector<Vector3f> inpainting, 
     return brdfReplacement;
 }
 
-Vector3f BrdfReplacement::brdf(Vector3f sampleDir, Vector3f V, Vector3f objectNormal, int type){
+Vector3f BrdfReplacement::brdf(Vector3f sampleDir, Vector3f V, Vector3f objectNormal, int type, Vector3f sampleNum){
     Vector3f color = m_diffuse;
     Vector3f specular = m_specular;
     float n = 5;
@@ -199,9 +199,9 @@ Vector3f BrdfReplacement::brdf(Vector3f sampleDir, Vector3f V, Vector3f objectNo
         Vector3f diffuseCoeff = color/(M_PI);
         Vector3f specularCoeff = specular/(M_PI) * (n + 2) * pow(fmax(0, refl.dot(V)), n);
         return diffuseCoeff + specularCoeff;
-    } else {
-        float roughness = 0.1;
-        float r0 = 0.8;
+    } else if(type == 1 ) {
+        float roughness = 0.1f;
+        float r0 = 0.8f;
 
         Vector3f H = sampleDir + V;
         H = H.normalized();
@@ -224,7 +224,65 @@ Vector3f BrdfReplacement::brdf(Vector3f sampleDir, Vector3f V, Vector3f objectNo
         Vector3f diffuseCoeff = color/(M_PI);
 
         return diffuseCoeff + specular * ks;
+    } else {
+        objectNormal = objectNormal.normalized();
+
+        // with lots of help from:
+        //http://silviojemma.com/public/papers/lighting/spherical-harmonic-lighting.pdf
+        //https://computergraphics.stackexchange.com/questions/4997/spherical-harmonics-diffuse-cubemap-how-to-get-coefficients
+        std::vector<Vector3f> samples;
+        Vector3f lightColor = m_diffuse;
+        samples.push_back(lightColor * 0.282095);
+        samples.push_back(lightColor * 0.488603 * objectNormal[0] *2.0/3);
+        samples.push_back(lightColor * 0.488603 * objectNormal[2]*2.0/3);
+        samples.push_back(lightColor * 0.488603 * objectNormal[1]*2.0/3);
+        samples.push_back(lightColor * 1.092548 * objectNormal[0]*objectNormal[2]*1.0/4);
+        samples.push_back(lightColor * 1.092548 * objectNormal[1]*objectNormal[2]*1.0/4);
+        samples.push_back(lightColor * 1.092548 * objectNormal[1]*objectNormal[0]*1.0/4);
+        samples.push_back(lightColor * (0.946176 * objectNormal[2] * objectNormal[2] - 0.315392) *1.0/4);
+        samples.push_back(lightColor * (0.546274 * (objectNormal[0]*objectNormal[0] - objectNormal[1]*objectNormal[1]))*1.0/4);
+        Vector3f out = Vector3f(0,0,0);
+        for(int i = 0; i < 9; i++){
+            out[0] += samples[i][0] * lc[i][sampleNum[0]][0];
+            out[1] += samples[i][1] * lc[i][sampleNum[0]][1];
+            out[2] += samples[i][2] * lc[i][sampleNum[0]][2];
+        }
+        return out;
+
     }
+}
+
+std::vector<Vector3f> BrdfReplacement::basisSH(Vector3f normal, Vector3f lightColor){
+    normal = normal.normalized();
+
+    lightColor = lightColor/255.0f;
+    std::vector<Vector3f> samples;
+    samples.push_back(lightColor * 0.282095);
+    samples.push_back(lightColor * 0.488603 * normal[0]);
+    samples.push_back(lightColor *  0.488603 * normal[2]);
+    samples.push_back(lightColor * 0.488603 * normal[1]);
+    samples.push_back(lightColor * 1.092548 * normal[0]*normal[2]);
+    samples.push_back(lightColor * 1.092548 * normal[1]*normal[0]);
+    samples.push_back(lightColor * 1.092548 * normal[1]*normal[0]);
+    samples.push_back(lightColor * (0.946176 * normal[2] * normal[2] - 0.315392));
+    samples.push_back(lightColor * 0.546274 * (normal[0]*normal[0] - normal[1]*normal[1]));
+    return samples;
+}
+
+std::vector<std::vector<Vector3f>> BrdfReplacement::reduceSHLights(std::vector<Vector3f> sampleDirs, std::vector<Vector3f> sampleColors){
+    std::vector<std::vector<Vector3f>> acc;
+    for(int i = 0; i < 9; i++){
+        std::vector<Vector3f> empty;
+        acc.push_back(empty);
+    }
+    for(int i = 0; i < sampleDirs.size(); i++){
+        std::vector<Vector3f> per = basisSH(sampleDirs[i], sampleColors[i]);
+        for(int j = 0; j < 9; j++){
+            acc[j].push_back(per[j]);
+        }
+    }
+
+    return acc;
 }
 
 void BrdfReplacement::sampleSpecular(std::vector<Vector3f> &image, std::vector<Vector3f> mask, std::vector<Vector3f> normals,int rows, int cols, std::vector<Vector3f> highlights, std::vector<Vector3f> lightColors, float shiny){

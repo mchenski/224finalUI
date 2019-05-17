@@ -44,8 +44,10 @@ public:
     void writeDesiredToFile(std::string filename, std::vector<float> data);
     void saveEnvmap(std::vector<Eigen::Vector3f> sampledColors);
     void getNewEnvmap(std::string filename, Eigen::VectorXf &envmapChannel);
-    Vector3f brdf(Vector3f sampleDir, Vector3f V, Vector3f objectNormal, int type);
+    Vector3f brdf(Vector3f sampleDir, Vector3f V, Vector3f objectNormal, int type, Vector3f li);
 
+    std::vector<Vector3f> basisSH(Vector3f normal, Vector3f lightColor);
+    std::vector<std::vector<Vector3f>> reduceSHLights(std::vector<Vector3f> sampleDirs, std::vector<Vector3f> sampleColors);
     std::vector<int> us;
     std::vector<int> vs;
     Eigen::MatrixXf reds;
@@ -57,6 +59,7 @@ public:
     Eigen::MatrixXf blueSpecular;
 
     std::vector<Eigen::Vector3f> specularDirs;
+    std::vector<std::vector<Vector3f>> lc;
 
     int m_solve = 0;
     int m_maskArea = 0;

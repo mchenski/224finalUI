@@ -151,7 +151,9 @@ bool MaterialManager::changeBrdf(){
            br.brdf_type = 0;
     } else if(settings.BRDFType == BRDF_METALLIC){
        br.brdf_type = 1;
-    }
+    }else if(settings.BRDFType == BRDF_OTHER){
+        br.brdf_type = 2;
+     }
     br.m_diffuse = materialParams.diffuse;
     br.m_specular = materialParams.specular;
 
