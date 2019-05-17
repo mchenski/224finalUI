@@ -229,7 +229,7 @@ Vector3f BrdfReplacement::brdf(Vector3f sampleDir, Vector3f V, Vector3f objectNo
 
         // with lots of help from:
         //http://silviojemma.com/public/papers/lighting/spherical-harmonic-lighting.pdf
-        //https://computergraphics.stackexchange.com/questions/4997/spherical-harmonics-diffuse-cubemap-how-to-get-coefficients
+        // https://cseweb.ucsd.edu/~ravir/papers/envmap/envmap.pdf
         std::vector<Vector3f> samples;
         Vector3f lightColor = m_diffuse;
         samples.push_back(lightColor * 0.282095);

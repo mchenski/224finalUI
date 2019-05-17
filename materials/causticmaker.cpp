@@ -71,10 +71,11 @@ std::vector<Vector3f> CausticMaker::project(float x1, float y1, float x2, float 
     for(int i = 0; i < m_rows; i++){
         for(int j = 0; j < m_cols; j++){
             Vector3f invMap = mapCoordinate(mapper, j, i);
-            int x = int(invMap[0]);
-            int y = int(invMap[1]);
+            int x = fmax(fmin(int(invMap[0]), m_cols - 1), 0.0);
+            int y = fmax(fmin(int(invMap[1]), m_rows - 1), 0.0);
             if( i > fmin(y1, y2) && i < fmax(y3, y4)){
                 if(j > fmin(x1, x4) && j < fmax(x2, x3)){
+                    std::cout << y * m_cols + x << std::endl;
                     if( m_caustic[y * m_cols + x][0] > 0 && x < m_cols && y < m_rows && x > 0 && y > 0){
                         result[i * m_cols + j][0] = fmin(alpha * 255.0 * m_caustic[y * m_cols + x][0] + m_image[i * m_cols + j][0], 255);
                         result[i * m_cols + j][1] = fmin(alpha * 255.0 * m_caustic[y * m_cols + x][1] + m_image[i * m_cols + j][1], 255);

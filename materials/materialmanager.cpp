@@ -471,7 +471,7 @@ bool MaterialManager::makeCaustic(){
 
     std::cout << "Solved caustic" << std::endl;
 
-    //ImageReader c("images/caustic.png");
+
     std::ifstream infile("caustic_data.txt");
     std::string str;
     std::vector<Vector3f> c;
@@ -482,6 +482,7 @@ bool MaterialManager::makeCaustic(){
 
     CausticMaker cm(c, retexturing, rows, cols);
     std::vector<int> xyLoc = materialParams.causticCorners;
+    std::cout << xyLoc.size() << std::endl;
     std::vector<Vector3f> caustic = cm.project(xyLoc[0],xyLoc[1],xyLoc[2],xyLoc[3],xyLoc[4],xyLoc[5],xyLoc[6],xyLoc[7]);
 
     vectorToFile(caustic, "images/output.png", rows, cols);
