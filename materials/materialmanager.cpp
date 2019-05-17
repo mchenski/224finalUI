@@ -289,6 +289,8 @@ bool MaterialManager::retexture(){
     Retexture retextureObj;
     retextureObj.m_s = materialParams.s;
 
+    retextureObj.weights = depth;
+    std::cout << depth.size() << " " << "weights" << std::endl;
     std::vector<Vector3f> retexturing;
     retextureObj.calculateTexture(texture.toVector(), inpainting, im.toVector(), gradientX, gradientY, retexturing, mask );
     vectorToFile(retexturing, "images/output.png", rows, cols);

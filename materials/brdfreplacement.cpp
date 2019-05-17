@@ -18,7 +18,7 @@
 #include <QProcessEnvironment>
 #include <map>
 
-#define OPTIMIZE 0
+#define OPTIMIZE 1
 using namespace Eigen;
 using namespace std;
 BrdfReplacement::BrdfReplacement()

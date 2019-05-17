@@ -21,6 +21,7 @@ public:
     int m_frosty = 5;
     float m_darkness = 1.8f;
     Vector3f m_glassColor = Vector3f(1,1,1);
+    std::vector<float> weights;
 
 private:
     float m_f = 0.0f;
